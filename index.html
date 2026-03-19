@@ -958,19 +958,68 @@ td{padding:7px 10px;vertical-align:middle;}
     <div class="modal-body">
       <div class="form-group">
         <label class="form-label">Formato</label>
-        <div class="export-grid">
+        <div class="export-grid" style="grid-template-columns:1fr 1fr 1fr;">
           <div class="export-card selected" id="fmt-txt" onclick="selectFmt('txt')">
             <div class="export-icon">📄</div>
             <div class="export-name">TXT</div>
-            <div class="export-desc">Texto plano por proveedor</div>
+            <div class="export-desc">Archivo de texto técnico</div>
           </div>
           <div class="export-card" id="fmt-pdf" onclick="selectFmt('pdf')">
             <div class="export-icon">📋</div>
             <div class="export-name">PDF</div>
-            <div class="export-desc">Documento con tablas y totales</div>
+            <div class="export-desc">Documento con tablas</div>
+          </div>
+          <div class="export-card" id="fmt-msg" onclick="selectFmt('msg')">
+            <div class="export-icon">💬</div>
+            <div class="export-name">Mensaje</div>
+            <div class="export-desc">Copiar y enviar por WhatsApp</div>
           </div>
         </div>
       </div>
+
+      <!-- Mensaje options — only shown when fmt=msg -->
+      <div id="msg-options" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">Saludo / introducción</label>
+          <input type="text" class="form-input" id="msg-saludo" placeholder="Hola, te mando el pedido para el martes." value="Hola, te mando el pedido para el martes.">
+          <div class="form-hint">Se incluirá al inicio del mensaje. Déjalo vacío para omitirlo.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Incluir cantidad pedida</label>
+          <div style="display:flex;gap:12px;">
+            <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
+              <input type="radio" name="msg-qty-mode" value="si" checked style="accent-color:var(--accent)"> Sí
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
+              <input type="radio" name="msg-qty-mode" value="no" style="accent-color:var(--accent)"> Solo nombre
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
+            <input type="checkbox" id="msg-separar-provs" checked style="accent-color:var(--accent)"> Separar por proveedor con encabezado
+          </label>
+        </div>
+      </div>
+
+      <!-- Standard options — hidden when fmt=msg -->
+      <div id="std-options">
+        <div class="form-group">
+          <label class="form-label">Incluir en el documento</label>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
+              <input type="checkbox" id="inc-sin-pedido" checked style="accent-color:var(--accent)"> Incluir artículos sin pedido
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
+              <input type="checkbox" id="inc-recepcion" checked style="accent-color:var(--accent)"> Incluir columna de recepción/diferencias
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
+              <input type="checkbox" id="inc-precios" checked style="accent-color:var(--accent)"> Incluir precios y totales
+            </label>
+          </div>
+        </div>
+      </div>
+
       <div class="form-group">
         <label class="form-label">Seleccionar proveedores <span style="color:var(--text-muted)">(solo con pedido)</span></label>
         <div style="display:flex;gap:6px;margin-bottom:8px;">
@@ -979,24 +1028,44 @@ td{padding:7px 10px;vertical-align:middle;}
         </div>
         <div class="prov-select-list" id="prov-select-list"></div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Incluir en el documento</label>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
-            <input type="checkbox" id="inc-sin-pedido" checked style="accent-color:var(--accent)"> Incluir artículos sin pedido
-          </label>
-          <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
-            <input type="checkbox" id="inc-recepcion" checked style="accent-color:var(--accent)"> Incluir columna de recepción/diferencias
-          </label>
-          <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
-            <input type="checkbox" id="inc-precios" checked style="accent-color:var(--accent)"> Incluir precios y totales
-          </label>
-        </div>
-      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('modal-export')">Cancelar</button>
-      <button class="btn btn-accent" onclick="runExport()">↗ Exportar seleccionados</button>
+      <button class="btn btn-accent" id="btn-run-export" onclick="runExport()">↗ Exportar seleccionados</button>
+    </div>
+  </div>
+</div>
+
+<!-- MENSAJE PREVIEW MODAL -->
+<div class="modal-overlay" id="modal-mensaje">
+  <div class="modal" style="max-width:500px;">
+    <div class="modal-header">
+      <span class="modal-title">💬 Mensaje listo</span>
+      <button class="modal-close" onclick="closeModal('modal-mensaje')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <span style="font-size:11px;color:var(--text-dim);">Revisa y edita si lo necesitas antes de copiar</span>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-ghost btn-sm" onclick="regenerarMensaje()">↺ Regenerar</button>
+          <button class="btn btn-accent btn-sm" id="btn-copiar-msg" onclick="copiarMensaje()">📋 Copiar</button>
+        </div>
+      </div>
+      <textarea id="msg-preview"
+        style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);
+               padding:12px 14px;border-radius:var(--radius);font-family:'DM Sans',sans-serif;
+               font-size:14px;line-height:1.7;resize:vertical;min-height:320px;outline:none;
+               white-space:pre-wrap;"
+        spellcheck="false"></textarea>
+      <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-sm" onclick="copiarMensajeYCerrar()">📋 Copiar y cerrar</button>
+        <button class="btn btn-ghost btn-sm" onclick="descargarMensajeTxt()">⬇ Descargar .txt</button>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:flex-start;gap:8px;">
+      <span style="font-size:11px;color:var(--text-muted)" id="msg-char-count"></span>
+      <span style="flex:1"></span>
+      <button class="btn btn-ghost" onclick="closeModal('modal-mensaje')">Cerrar</button>
     </div>
   </div>
 </div>
@@ -1886,6 +1955,10 @@ function selectFmt(f) {
   exportFmt = f;
   document.getElementById('fmt-txt').classList.toggle('selected', f==='txt');
   document.getElementById('fmt-pdf').classList.toggle('selected', f==='pdf');
+  document.getElementById('fmt-msg').classList.toggle('selected', f==='msg');
+  document.getElementById('msg-options').style.display = f==='msg' ? 'block' : 'none';
+  document.getElementById('std-options').style.display = f==='msg' ? 'none' : 'block';
+  document.getElementById('btn-run-export').textContent = f==='msg' ? '💬 Generar mensaje' : '↗ Exportar seleccionados';
 }
 function renderExportProvList() {
   const list = document.getElementById('prov-select-list');
@@ -1925,13 +1998,17 @@ function runExport() {
   const fecha = document.getElementById('fecha-input').value;
   const responsable = document.getElementById('responsable-input').value;
   const incidencias = document.getElementById('incidencias-input').value;
-
   const provsToExport = allProvs().filter(p => selectedExportProvs.has(p.id));
 
-  if (exportFmt === 'txt') exportTxt(provsToExport, fecha, responsable, incidencias, incSinPedido, incRec, incPrecios);
-  else exportPdf(provsToExport, fecha, responsable, incidencias, incSinPedido, incRec, incPrecios);
-
-  closeModal('modal-export');
+  if (exportFmt === 'txt') {
+    exportTxt(provsToExport, fecha, responsable, incidencias, incSinPedido, incRec, incPrecios);
+    closeModal('modal-export');
+  } else if (exportFmt === 'pdf') {
+    exportPdf(provsToExport, fecha, responsable, incidencias, incSinPedido, incRec, incPrecios);
+    closeModal('modal-export');
+  } else if (exportFmt === 'msg') {
+    abrirMensaje(provsToExport);
+  }
 }
 
 // ─── TXT EXPORT ───
@@ -2886,6 +2963,105 @@ function toggleOkCard(pid) {
 function syncAllCloudDots() {
   const state = CLOUD.enabled ? (CLOUD.syncing ? 'syncing' : (CLOUD.lastSync ? 'online' : '')) : '';
   setCloudDot(state);
+}
+
+// ═══════════════════════════════════════════════
+//  MENSAJE — WhatsApp / texto limpio
+// ═══════════════════════════════════════════════
+
+let _msgProvs = []; // cached for regenerate
+
+function abrirMensaje(provs) {
+  _msgProvs = provs;
+  closeModal('modal-export');
+  const txt = generarTextoMensaje(provs);
+  const ta = document.getElementById('msg-preview');
+  ta.value = txt;
+  actualizarContadorChars();
+  ta.addEventListener('input', actualizarContadorChars);
+  openModal('modal-mensaje');
+}
+
+function regenerarMensaje() {
+  if (!_msgProvs.length) return;
+  document.getElementById('msg-preview').value = generarTextoMensaje(_msgProvs);
+  actualizarContadorChars();
+}
+
+function actualizarContadorChars() {
+  const ta = document.getElementById('msg-preview');
+  const n = ta.value.length;
+  const el = document.getElementById('msg-char-count');
+  if (el) el.textContent = `${n} caracteres`;
+}
+
+function generarTextoMensaje(provs) {
+  const saludo     = document.getElementById('msg-saludo').value.trim();
+  const conQty     = document.querySelector('input[name="msg-qty-mode"]:checked')?.value !== 'no';
+  const sepProvs   = document.getElementById('msg-separar-provs').checked;
+
+  const lines = [];
+
+  // Saludo
+  if (saludo) { lines.push(saludo); lines.push(''); }
+
+  provs.forEach((prov, pi) => {
+    const prods = prov.productos.filter(p => (pedido[p.id]||{}).qty);
+    if (!prods.length) return;
+
+    // Encabezado de proveedor
+    if (sepProvs) {
+      if (pi > 0) lines.push('');
+      lines.push(prov.nombre);
+    }
+
+    prods.forEach(p => {
+      const qty = (pedido[p.id]||{}).qty || '';
+      if (conQty && qty) {
+        lines.push(`${p.desc} ${qty}`);
+      } else {
+        lines.push(p.desc);
+      }
+    });
+  });
+
+  return lines.join('\n');
+}
+
+async function copiarMensaje() {
+  const txt = document.getElementById('msg-preview').value;
+  try {
+    await navigator.clipboard.writeText(txt);
+    const btn = document.getElementById('btn-copiar-msg');
+    const original = btn.textContent;
+    btn.textContent = '✓ Copiado';
+    btn.style.background = 'var(--green)';
+    btn.style.color = '#0f0e0d';
+    setTimeout(() => { btn.textContent = original; btn.style.background=''; btn.style.color=''; }, 2000);
+    showToast('Mensaje copiado ✓','success');
+  } catch {
+    // Fallback for browsers without clipboard API
+    const ta = document.getElementById('msg-preview');
+    ta.select();
+    document.execCommand('copy');
+    showToast('Mensaje copiado ✓','success');
+  }
+}
+
+async function copiarMensajeYCerrar() {
+  await copiarMensaje();
+  setTimeout(() => closeModal('modal-mensaje'), 600);
+}
+
+function descargarMensajeTxt() {
+  const txt = document.getElementById('msg-preview').value;
+  const fecha = document.getElementById('fecha-input').value || new Date().toISOString().split('T')[0];
+  const blob = new Blob([txt], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `pedido_mensaje_${fecha}.txt`;
+  a.click();
+  showToast('Descargado ✓','success');
 }
 
 // ─── START ───
