@@ -103,7 +103,7 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 .prov-section.collapsed .chevron{transform:rotate(-90deg);}
 .prov-section.collapsed .prov-body{display:none;}
 
-/* ─── TABLE ─── */
+/* ─── TABLE (desktop) ─── */
 .prov-body{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:12px;}
 thead tr{background:var(--surface2);border-bottom:1px solid var(--border);}
@@ -137,12 +137,10 @@ td{padding:7px 10px;vertical-align:middle;}
 .rec-input.filled{border-color:var(--green);color:var(--green);background:rgba(76,175,125,.08);}
 .ok-check{width:16px;height:16px;cursor:pointer;accent-color:var(--green);display:block;margin:0 auto;}
 
-/* Edit price inline */
 .price-edit-wrap{display:inline-flex;align-items:center;gap:4px;}
 .price-edit-input{width:64px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:3px 6px;border-radius:4px;font-family:'DM Mono',monospace;font-size:11px;text-align:right;outline:none;}
 .price-edit-input:focus{border-color:var(--accent);}
 
-/* Action buttons in row */
 .row-actions{display:flex;gap:3px;align-items:center;justify-content:center;}
 .row-btn{padding:2px 6px;border-radius:3px;font-size:10px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text-dim);transition:all .12s;font-family:'DM Sans',sans-serif;}
 .row-btn:hover{border-color:var(--accent);color:var(--accent);}
@@ -165,6 +163,294 @@ td{padding:7px 10px;vertical-align:middle;}
 .inc-header{padding:8px 14px;background:var(--surface2);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);font-weight:600;}
 .inc-input{width:100%;background:transparent;border:none;color:var(--text);padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:12px;resize:vertical;min-height:55px;outline:none;}
 .inc-input::placeholder{color:var(--text-muted);}
+
+/* ─── MOBILE DRAWER (global — works on any screen size) ─── */
+.mobile-drawer{
+  position:fixed; inset:0; z-index:300;
+  display:none; pointer-events:none;
+}
+.mobile-drawer.open{ display:block; pointer-events:auto; }
+.drawer-overlay{
+  position:absolute; inset:0; background:rgba(0,0,0,.6);
+  opacity:0; transition:opacity .25s;
+}
+.mobile-drawer.open .drawer-overlay{ opacity:1; }
+.drawer-panel{
+  position:absolute; top:0; right:0; bottom:0; width:82%; max-width:300px;
+  background:var(--surface); border-left:1px solid var(--border);
+  display:flex; flex-direction:column; overflow-y:auto;
+  transform:translateX(100%); transition:transform .25s ease;
+  pointer-events:auto;
+}
+.mobile-drawer.open .drawer-panel{ transform:translateX(0); }
+.drawer-header{
+  padding:16px; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.drawer-title{ font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:1px; }
+.drawer-close{
+  background:transparent; border:none; color:var(--text-dim);
+  font-size:20px; cursor:pointer; padding:4px;
+}
+.drawer-body{ padding:16px; display:flex; flex-direction:column; gap:14px; }
+.drawer-section-title{
+  font-size:9px; letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--text-muted); font-weight:600; margin-bottom:6px;
+}
+.drawer-meta-field{ display:flex; flex-direction:column; gap:4px; }
+.drawer-meta-field label{ font-size:10px; color:var(--text-dim); letter-spacing:.5px; text-transform:uppercase; }
+.drawer-meta-field input{
+  background:var(--surface2); border:1px solid var(--border); color:var(--text);
+  padding:10px 12px; border-radius:var(--radius);
+  font-family:'DM Mono',monospace; font-size:14px; outline:none; width:100%;
+}
+.drawer-meta-field input:focus{ border-color:var(--accent); }
+.drawer-btn{
+  padding:12px 16px; border-radius:var(--radius); font-size:14px; font-weight:600;
+  cursor:pointer; display:flex; align-items:center; gap:8px;
+  transition:all .15s; width:100%; justify-content:flex-start;
+  background:var(--surface2); color:var(--text); border:1px solid var(--border);
+}
+.drawer-btn:active{ background:var(--surface3); }
+.drawer-btn.accent{ background:var(--accent); color:#0f0e0d; border-color:var(--accent); }
+.drawer-btn.green{ background:var(--green); color:#0f0e0d; border-color:var(--green); }
+.drawer-divider{ border:none; border-top:1px solid var(--border); }
+
+/* ═══════════════════════════════════════
+   MOBILE CARDS (≤768px)
+═══════════════════════════════════════ */
+
+/* Cards container — hidden on desktop */
+.cards-container{ display:none; }
+
+/* ─── MOBILE HEADER ─── */
+@media(max-width:768px){
+  header{ padding:0 12px; gap:8px; }
+  .logo-sub{ display:none; }
+  .header-meta{ display:none; }  /* moved to mobile drawer */
+  .header-btns .btn-ghost:not(#btn-cloud-save){ display:none; }
+  .header-btns{ gap:6px; }
+
+  /* Mobile top bar: logo + cloud dot + hamburger */
+  .mobile-topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    width:100%; padding:10px 0;
+  }
+  .mobile-hamburger{
+    background:var(--surface2); border:1px solid var(--border);
+    color:var(--text); padding:7px 10px; border-radius:var(--radius);
+    font-size:16px; cursor:pointer; line-height:1;
+  }
+
+  /* Tabs: bigger touch targets */
+  .tabs-bar{ padding:0 12px; }
+  .tab{ padding:13px 16px; font-size:13px; }
+  .tabs-right{ display:none; } /* move to FAB */
+
+  /* Main padding */
+  .main{ padding:10px 12px; }
+
+  /* Hide desktop table, show cards */
+  table, thead, tbody, th, td, tr { display:none !important; }
+  .cards-container{ display:flex; flex-direction:column; gap:0; }
+
+  /* ─── PRODUCT CARD ─── */
+  .prod-card{
+    display:grid;
+    grid-template-columns:1fr auto;
+    grid-template-rows:auto auto;
+    gap:0;
+    padding:12px 14px;
+    border-bottom:1px solid var(--border);
+    background:var(--bg);
+    transition:background .1s;
+    position:relative;
+  }
+  .prod-card:last-child{ border-bottom:none; }
+  .prod-card.has-pedido{ background:rgba(232,160,32,.05); }
+  .prod-card.recibido{ background:rgba(76,175,125,.06); }
+  .prod-card.diferencia-pos{ background:rgba(232,200,32,.07); }
+  .prod-card.diferencia-neg{ background:rgba(224,85,85,.07); }
+
+  /* Left: name + format + par */
+  .card-left{ grid-column:1; grid-row:1; padding-right:12px; }
+  .card-name{ font-size:14px; font-weight:600; color:var(--text); line-height:1.3; }
+  .card-meta{
+    display:flex; align-items:center; gap:6px; margin-top:3px; flex-wrap:wrap;
+  }
+  .card-formato{ font-size:11px; color:var(--text-dim); }
+  .card-par{
+    font-size:10px; font-family:'DM Mono',monospace; color:var(--text-muted);
+    background:var(--surface2); padding:1px 6px; border-radius:3px;
+  }
+  .card-precio{
+    font-size:10px; font-family:'DM Mono',monospace; color:var(--green);
+  }
+
+  /* Right: qty input + diff badge */
+  .card-right{
+    grid-column:2; grid-row:1 / span 2;
+    display:flex; flex-direction:column; align-items:flex-end;
+    justify-content:center; gap:6px; min-width:80px;
+  }
+
+  /* Bottom row: recibido + OK + subtotal */
+  .card-bottom{
+    grid-column:1; grid-row:2;
+    display:flex; align-items:center; gap:8px; margin-top:8px; flex-wrap:wrap;
+  }
+  .card-bottom-hidden{ display:none; }
+
+  /* Qty input — large touch target */
+  .card-qty{
+    width:72px; height:40px;
+    background:var(--surface2); border:1.5px solid var(--border);
+    color:var(--text); border-radius:8px;
+    font-family:'DM Mono',monospace; font-size:16px; font-weight:600;
+    text-align:center; outline:none; transition:all .15s;
+    -webkit-appearance:none; appearance:none;
+  }
+  .card-qty:focus{ border-color:var(--accent); background:var(--surface); }
+  .card-qty.filled{
+    border-color:var(--accent); color:var(--accent);
+    background:rgba(232,160,32,.1);
+  }
+
+  /* Rec input */
+  .card-rec{
+    width:64px; height:36px;
+    background:var(--surface2); border:1.5px solid var(--border);
+    color:var(--text); border-radius:8px;
+    font-family:'DM Mono',monospace; font-size:14px;
+    text-align:center; outline:none;
+  }
+  .card-rec.filled{ border-color:var(--green); color:var(--green); background:rgba(76,175,125,.1); }
+  .card-rec:focus{ border-color:var(--green); }
+
+  /* Diff badge */
+  .card-diff{
+    font-family:'DM Mono',monospace; font-size:12px; font-weight:700;
+    padding:2px 8px; border-radius:4px; white-space:nowrap;
+  }
+  .card-diff.ok{ color:var(--green); background:rgba(76,175,125,.12); }
+  .card-diff.pos{ color:#e8c820; background:rgba(232,200,32,.12); }
+  .card-diff.neg{ color:var(--red); background:rgba(224,85,85,.12); }
+
+  /* OK toggle — large tap area */
+  .card-ok{
+    display:flex; align-items:center; justify-content:center;
+    width:36px; height:36px; border-radius:8px;
+    border:1.5px solid var(--border); background:var(--surface2);
+    font-size:16px; cursor:pointer; transition:all .15s; flex-shrink:0;
+  }
+  .card-ok.checked{ background:rgba(76,175,125,.15); border-color:var(--green); }
+
+  /* Subtotal chip */
+  .card-sub{
+    font-family:'DM Mono',monospace; font-size:11px; color:var(--accent);
+    background:rgba(232,160,32,.1); padding:2px 8px; border-radius:4px;
+  }
+
+  /* Price edit in card */
+  .card-price-edit{
+    width:60px; height:28px;
+    background:var(--surface2); border:1px solid var(--border);
+    color:var(--green); border-radius:6px;
+    font-family:'DM Mono',monospace; font-size:11px;
+    text-align:right; outline:none; padding:0 6px;
+  }
+  .card-price-edit:focus{ border-color:var(--accent); }
+
+  /* rec row label */
+  .card-rec-label{
+    font-size:10px; color:var(--text-muted); text-transform:uppercase;
+    letter-spacing:.5px; align-self:center;
+  }
+
+  /* Summary bar — compact on mobile */
+  .summary-bar{
+    padding:6px 12px;
+    flex-direction:row;
+    align-items:center;
+    gap:8px;
+  }
+  .summary-stats{
+    gap:12px;
+    flex:1;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  .summary-stats::-webkit-scrollbar{ display:none; }
+  .s-value{ font-size:13px; }
+  .s-label{ font-size:7px; }
+  .summary-btns .btn{ display:none; } /* use FAB instead */
+
+  /* ─── FAB (Floating Action Buttons) ─── */
+  .fab-area{
+    position:fixed; bottom:58px; right:14px;
+    display:flex; flex-direction:column; align-items:flex-end; gap:10px;
+    z-index:149;
+  }
+  .fab{
+    width:48px; height:48px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:20px; cursor:pointer; border:none;
+    box-shadow:0 3px 12px rgba(0,0,0,.5);
+    transition:transform .15s;
+  }
+  .fab:active{ transform:scale(.92); }
+  .fab-main{ background:var(--accent); color:#0f0e0d; }
+  .fab-cloud{ background:var(--green); color:#0f0e0d; font-size:18px; }
+  .fab-next{ background:var(--surface2); border:1px solid var(--border); color:var(--text); font-size:16px; }
+
+  /* Filter pills scrollable on mobile */
+  .filter-pills{
+    flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; padding-bottom:2px;
+  }
+  .filter-pills::-webkit-scrollbar{ display:none; }
+  .pill{ flex-shrink:0; }
+
+  /* Spacer for summary + FAB */
+  .spacer-b{ height:100px; }
+
+  /* Modal full-screen on mobile */
+  .modal{ max-height:95vh; border-radius:12px 12px 0 0; margin-top:auto; }
+  .modal-overlay{ align-items:flex-end; padding:0; }
+
+  /* Prov header — bigger tap */
+  .prov-header{ padding:13px 14px; }
+  .prov-name{ font-size:16px; }
+
+  /* Hide edit btn in prov header on mobile (accessible from drawer) */
+  .prov-edit-btn{ display:none; }
+}
+
+/* ─── TABLET (769–1024px) ─── */
+@media(min-width:769px) and (max-width:1024px){
+  .header-meta .meta-field:last-child{ display:none; }
+  .header-btns .btn-ghost:nth-child(2){ display:none; } /* hide Sincronizar text, keep icon */
+
+  /* Keep table but simplify columns */
+  .col-hide-tablet{ display:none !important; }
+
+  .qty-input,.rec-input{ width:60px; }
+  .price-edit-input{ width:56px; }
+
+  .summary-stats{ gap:12px; }
+  .s-value{ font-size:13px; }
+
+  .main{ padding:12px 16px; }
+}
+
+/* Mobile-only elements — hidden on desktop */
+.mobile-topbar{ display:none; }
+.fab-area{ display:none; }
+
+@media(max-width:768px){
+  .mobile-topbar{ display:flex; }
+  .fab-area{ display:flex; }
+}
+
 
 /* ─── MODAL ─── */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:center;justify-content:center;padding:16px;}
@@ -373,8 +659,72 @@ td{padding:7px 10px;vertical-align:middle;}
   </div>
 </div>
 
+<!-- MOBILE DRAWER -->
+<div class="mobile-drawer" id="mobile-drawer">
+  <div class="drawer-overlay" onclick="closeDrawer()"></div>
+  <div class="drawer-panel">
+    <div class="drawer-header">
+      <span class="drawer-title">🌮 Botanero Azteca</span>
+      <button class="drawer-close" onclick="closeDrawer()">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div>
+        <div class="drawer-section-title">Sesión</div>
+        <div class="drawer-meta-field">
+          <label>Fecha</label>
+          <input type="date" id="drawer-fecha">
+        </div>
+        <div class="drawer-meta-field" style="margin-top:8px;">
+          <label>Responsable</label>
+          <input type="text" id="drawer-responsable" placeholder="Nombre...">
+        </div>
+      </div>
+      <hr class="drawer-divider">
+      <div>
+        <div class="drawer-section-title">Acciones</div>
+        <button class="drawer-btn green" id="drawer-cloud-btn" onclick="cloudPush();closeDrawer()" style="display:none">☁ Guardar en la nube</button>
+        <button class="drawer-btn" onclick="openExportModal();closeDrawer()" style="margin-top:6px">↗ Exportar pedido</button>
+        <button class="drawer-btn" onclick="openSyncModal();closeDrawer()" style="margin-top:6px">⇄ Sincronizar local</button>
+        <button class="drawer-btn" id="drawer-provs-btn" onclick="openManageProvs();closeDrawer()" style="margin-top:6px">⚙ Proveedores</button>
+        <button class="drawer-btn" onclick="openAddProv();closeDrawer()" style="margin-top:6px">+ Nuevo proveedor</button>
+      </div>
+      <hr class="drawer-divider">
+      <div>
+        <div class="drawer-section-title">Estado nube</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <div class="cloud-dot" id="cloud-dot-drawer"></div>
+          <span style="font-size:12px;color:var(--text-dim)" id="cloud-label-drawer">Sin conexión</span>
+        </div>
+        <button class="drawer-btn" onclick="openCloudModal();closeDrawer()">☁ Configurar nube</button>
+      </div>
+      <hr class="drawer-divider">
+      <div>
+        <div class="drawer-section-title">Incidencias</div>
+        <textarea class="inc-input" id="drawer-incidencias" placeholder="Observaciones del pedido..." style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);min-height:70px;font-size:13px;"></textarea>
+      </div>
+      <button class="drawer-btn" onclick="doLogout();closeDrawer()" style="color:var(--text-dim);margin-top:4px;">Cambiar rol / Cerrar sesión</button>
+    </div>
+  </div>
+</div>
+
 <!-- HEADER -->
 <header>
+  <!-- Mobile top bar -->
+  <div class="mobile-topbar">
+    <div class="logo-area" style="padding:0">
+      <div class="logo-icon">🌮</div>
+      <div class="logo-text" style="font-size:17px">Botanero</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="cloud-status" id="cloud-status-btn-m" onclick="openCloudModal()">
+        <div class="cloud-dot" id="cloud-dot-m"></div>
+        <span id="cloud-label-m" style="font-size:10px;color:var(--text-dim)">Offline</span>
+      </div>
+      <button class="mobile-hamburger" onclick="openDrawer()">☰</button>
+    </div>
+  </div>
+
+  <!-- Desktop elements -->
   <div class="logo-area">
     <div class="logo-icon">🌮</div>
     <div>
@@ -404,6 +754,13 @@ td{padding:7px 10px;vertical-align:middle;}
     <button class="btn btn-accent" onclick="openExportModal()">↗ Exportar</button>
   </div>
 </header>
+
+<!-- FABs (mobile only) -->
+<div class="fab-area">
+  <button class="fab fab-cloud" id="fab-cloud" onclick="cloudPush()" title="Guardar en la nube" style="display:none">☁</button>
+  <button class="fab fab-next" onclick="scrollToNext()" title="Siguiente pendiente">⬇</button>
+  <button class="fab fab-main" onclick="openExportModal()" title="Exportar">↗</button>
+</div>
 
 <!-- TABS -->
 <div class="tabs-bar">
@@ -1091,6 +1448,8 @@ function renderFilterPills() {
 function setFilter(f) { activeFilter = f; renderFilterPills(); renderSections(); }
 
 // ─── RENDER SECTIONS ───
+function isMobile() { return window.innerWidth <= 768; }
+
 function renderSections() {
   const container = document.getElementById('sections-container');
   const search = (document.getElementById('search-input').value||'').toLowerCase();
@@ -1126,6 +1485,84 @@ function renderSections() {
       return st.qty && st.recibido && st.recibido !== '' && st.recibido !== st.qty;
     }).length;
 
+    // Desktop table rows
+    let tableRows = '';
+    prods.forEach(p => {
+      const st = pedido[p.id]||{qty:'',ok:false,recibido:'',precio_override:null};
+      const hasQty = !!(st.qty); const hasRec = !!(st.recibido);
+      const precioEff = getPrecio(p.id);
+      const qtyNum = num(st.qty); const recNum = num(st.recibido);
+      const subtotal = hasQty && precioEff ? (qtyNum * precioEff) : null;
+      let diffText = '—', diffClass = '';
+      if (hasQty && hasRec) {
+        const d = recNum - qtyNum;
+        if (Math.abs(d) < 0.001) { diffText = '✓'; diffClass = 'ok'; }
+        else { diffText = (d > 0 ? '+' : '') + d.toFixed(2); diffClass = d > 0 ? 'pos' : 'neg'; }
+      }
+      let rowClass = '';
+      if (hasQty) rowClass = 'has-pedido';
+      if (hasRec && diffClass === 'ok') rowClass = 'recibido';
+      if (hasRec && diffClass === 'pos') rowClass = 'diferencia-pos';
+      if (hasRec && diffClass === 'neg') rowClass = 'diferencia-neg';
+
+      tableRows += `<tr class="${rowClass}" id="row-${p.id}">
+        <td><div class="td-desc">${p.desc}</div><div class="td-fmt">${p.formato}</div></td>
+        <td class="td-par col-hide-tablet">${p.par||'—'}</td>
+        <td><input type="text" class="qty-input ${hasQty?'filled':''}" value="${st.qty||''}" placeholder="${p.par||''}" data-id="${p.id}" onchange="setPedidoQty('${p.id}',this.value)" oninput="setPedidoQty('${p.id}',this.value)"></td>
+        <td class="col-hide-tablet"><div class="price-edit-wrap"><input type="number" step="0.01" class="price-edit-input" value="${precioEff!=null?precioEff:''}" placeholder="€" onchange="setPrecioOverride('${p.id}',this.value)" style="color:${precioEff!=null?'var(--green)':'var(--text-muted)'}"></div></td>
+        <td><input type="text" class="rec-input ${hasRec?'filled':''}" value="${st.recibido||''}" placeholder="—" onchange="setRecibido('${p.id}',this.value)" oninput="setRecibido('${p.id}',this.value)"></td>
+        <td class="td-diff ${diffClass}">${diffText}</td>
+        <td><input type="checkbox" class="ok-check" ${st.ok?'checked':''} onchange="setOk('${p.id}',this.checked)"></td>
+        <td class="td-sub ${subtotal?'active':''} col-hide-tablet">${subtotal!=null?`€${subtotal.toFixed(2)}`:'—'}</td>
+      </tr>`;
+    });
+
+    // Mobile card rows
+    let cardRows = '';
+    prods.forEach(p => {
+      const st = pedido[p.id]||{qty:'',ok:false,recibido:'',precio_override:null};
+      const hasQty = !!(st.qty); const hasRec = !!(st.recibido);
+      const precioEff = getPrecio(p.id);
+      const qtyNum = num(st.qty); const recNum = num(st.recibido);
+      const subtotal = hasQty && precioEff ? (qtyNum * precioEff) : null;
+      let diffText = '', diffClass = '';
+      if (hasQty && hasRec) {
+        const d = recNum - qtyNum;
+        if (Math.abs(d) < 0.001) { diffText = '✓'; diffClass = 'ok'; }
+        else { diffText = (d > 0 ? '+' : '') + d.toFixed(2); diffClass = d > 0 ? 'pos' : 'neg'; }
+      }
+      let cardClass = '';
+      if (hasQty) cardClass = 'has-pedido';
+      if (hasRec && diffClass === 'ok') cardClass = 'recibido';
+      if (hasRec && diffClass === 'pos') cardClass = 'diferencia-pos';
+      if (hasRec && diffClass === 'neg') cardClass = 'diferencia-neg';
+
+      cardRows += `<div class="prod-card ${cardClass}" id="card-${p.id}">
+        <div class="card-left">
+          <div class="card-name">${p.desc}</div>
+          <div class="card-meta">
+            <span class="card-formato">${p.formato}</span>
+            ${p.par ? `<span class="card-par">${p.par}</span>` : ''}
+            ${precioEff != null ? `<span class="card-precio">€${precioEff.toFixed(2)}</span>` : ''}
+          </div>
+        </div>
+        <div class="card-right">
+          <input type="text" inputmode="decimal" class="card-qty ${hasQty?'filled':''}" value="${st.qty||''}" placeholder="—"
+            onchange="setPedidoQty('${p.id}',this.value)" oninput="setPedidoQty('${p.id}',this.value)">
+          ${diffText ? `<span class="card-diff ${diffClass}">${diffText}</span>` : ''}
+        </div>
+        <div class="card-bottom ${!hasQty?'card-bottom-hidden':''}" id="card-bottom-${p.id}">
+          <span class="card-rec-label">Recibido:</span>
+          <input type="text" inputmode="decimal" class="card-rec ${hasRec?'filled':''}" value="${st.recibido||''}" placeholder="—"
+            onchange="setRecibido('${p.id}',this.value)" oninput="setRecibido('${p.id}',this.value)">
+          <div class="card-ok ${st.ok?'checked':''}" id="card-ok-${p.id}" onclick="toggleOkCard('${p.id}')">
+            ${st.ok ? '✓' : '○'}
+          </div>
+          ${subtotal ? `<span class="card-sub">€${subtotal.toFixed(2)}</span>` : ''}
+        </div>
+      </div>`;
+    });
+
     html += `<div class="prov-section ${isCollapsed?'collapsed':''}" id="sec-${prov.id}">
       <div class="prov-header" onclick="toggleSection('${prov.id}')">
         <div class="prov-info">
@@ -1135,72 +1572,26 @@ function renderSections() {
           ${prov.telefono?`<span class="prov-tag">📞 ${prov.telefono}</span>`:''}
         </div>
         <div class="prov-stats">
-          <span style="font-size:11px">${prods.length} productos</span>
-          ${pedidoCount?`<span class="stat-items">${pedidoCount} pedidos</span>`:''}
+          <span style="font-size:11px">${prods.length} prod.</span>
+          ${pedidoCount?`<span class="stat-items">${pedidoCount} ped.</span>`:''}
           ${totalEst?`<span class="stat-est">≈€${totalEst.toFixed(2)}</span>`:''}
-          ${diffCount?`<span class="stat-diff over">⚠ ${diffCount} dif.</span>`:''}
-          <button class="btn btn-ghost btn-sm" style="margin-left:4px" onclick="event.stopPropagation();openEditProv('${prov.id}')">✏</button>
+          ${diffCount?`<span class="stat-diff over">⚠${diffCount}</span>`:''}
+          <button class="btn btn-ghost btn-sm prov-edit-btn" style="margin-left:4px" onclick="event.stopPropagation();openEditProv('${prov.id}')">✏</button>
           <span class="chevron">▼</span>
         </div>
       </div>
       <div class="prov-body">
         <table>
           <thead><tr>
-            <th>Producto</th>
-            <th class="c">Parámetro</th>
-            <th class="c">Pedido</th>
-            <th class="c">Precio</th>
-            <th class="c">Recibido</th>
-            <th class="c">Diferencia</th>
-            <th class="c">OK</th>
-            <th class="r">Subtotal est.</th>
+            <th>Producto</th><th class="c col-hide-tablet">Parámetro</th><th class="c">Pedido</th>
+            <th class="c col-hide-tablet">Precio</th><th class="c">Recibido</th>
+            <th class="c">Diferencia</th><th class="c">OK</th><th class="r col-hide-tablet">Subtotal</th>
           </tr></thead>
-          <tbody>`;
-
-    prods.forEach(p => {
-      const st = pedido[p.id]||{qty:'',ok:false,recibido:'',precio_override:null};
-      const hasQty = !!(st.qty);
-      const hasRec = !!(st.recibido);
-      const precioEff = getPrecio(p.id);
-      const qtyNum = num(st.qty);
-      const recNum = num(st.recibido);
-      const subtotal = hasQty && precioEff ? (qtyNum * precioEff) : null;
-
-      let diffText = '—', diffClass = '';
-      if (hasQty && hasRec) {
-        const d = recNum - qtyNum;
-        if (Math.abs(d) < 0.001) { diffText = '✓'; diffClass = 'ok'; }
-        else {
-          diffText = (d > 0 ? '+' : '') + d.toFixed(2);
-          diffClass = d > 0 ? 'pos' : 'neg';
-        }
-      }
-
-      let rowClass = '';
-      if (hasQty) rowClass = 'has-pedido';
-      if (hasRec && diffClass === 'ok') rowClass = 'recibido';
-      if (hasRec && diffClass === 'pos') rowClass = 'diferencia-pos';
-      if (hasRec && diffClass === 'neg') rowClass = 'diferencia-neg';
-
-      html += `<tr class="${rowClass}" id="row-${p.id}">
-        <td><div class="td-desc">${p.desc}</div><div class="td-fmt">${p.formato}</div></td>
-        <td class="td-par">${p.par||'—'}</td>
-        <td><input type="text" class="qty-input ${hasQty?'filled':''}" value="${st.qty||''}" placeholder="${p.par||''}" data-id="${p.id}" onchange="setPedidoQty('${p.id}',this.value)" oninput="setPedidoQty('${p.id}',this.value)"></td>
-        <td>
-          <div class="price-edit-wrap">
-            <input type="number" step="0.01" class="price-edit-input" value="${precioEff!=null?precioEff:''}" placeholder="€" title="Editar precio" onchange="setPrecioOverride('${p.id}',this.value)" style="color:${precioEff!=null?'var(--green)':'var(--text-muted)'}">
-          </div>
-        </td>
-        <td><input type="text" class="rec-input ${hasRec?'filled':''}" value="${st.recibido||''}" placeholder="—" data-rec="${p.id}" onchange="setRecibido('${p.id}',this.value)" oninput="setRecibido('${p.id}',this.value)"></td>
-        <td class="td-diff ${diffClass}">${diffText}</td>
-        <td><input type="checkbox" class="ok-check" ${st.ok?'checked':''} onchange="setOk('${p.id}',this.checked)"></td>
-        <td class="td-sub ${subtotal?'active':''}">
-          ${subtotal!=null?`€${subtotal.toFixed(2)}`:'—'}
-        </td>
-      </tr>`;
-    });
-
-    html += `</tbody></table></div></div>`;
+          <tbody>${tableRows}</tbody>
+        </table>
+        <div class="cards-container">${cardRows}</div>
+      </div>
+    </div>`;
   });
 
   if (!anyVisible) html = `<div style="text-align:center;padding:50px;color:var(--text-muted);font-size:13px;">Sin resultados para este filtro.</div>`;
@@ -2485,6 +2876,80 @@ function init() {
   setInterval(() => { if (CLOUD.enabled && CLOUD.binId && !CLOUD.syncing) cloudPush(); }, 3 * 60 * 1000);
 
   renderColorOpts();
+}
+
+// ═══════════════════════════════════════════════
+//  MOBILE — Drawer + Cards
+// ═══════════════════════════════════════════════
+function openDrawer() {
+  const drawer = document.getElementById('mobile-drawer');
+  drawer.classList.add('open');
+  // Sync field values into drawer
+  document.getElementById('drawer-fecha').value = document.getElementById('fecha-input').value || '';
+  document.getElementById('drawer-responsable').value = document.getElementById('responsable-input').value || '';
+  document.getElementById('drawer-incidencias').value = document.getElementById('incidencias-input').value || '';
+  // Cloud btn visibility
+  const cb = document.getElementById('drawer-cloud-btn');
+  if (cb) cb.style.display = CLOUD.enabled ? '' : 'none';
+  const pb = document.getElementById('drawer-provs-btn');
+  if (pb) pb.style.display = (ROLES[currentRole]?.canManageProvs) ? '' : 'none';
+  // Sync drawer dot
+  syncAllCloudDots();
+}
+
+function closeDrawer() {
+  const drawer = document.getElementById('mobile-drawer');
+  drawer.classList.remove('open');
+  // Save drawer values back to main fields
+  const df = document.getElementById('drawer-fecha').value;
+  const dr = document.getElementById('drawer-responsable').value;
+  const di = document.getElementById('drawer-incidencias').value;
+  if (df) document.getElementById('fecha-input').value = df;
+  if (dr) document.getElementById('responsable-input').value = dr;
+  document.getElementById('incidencias-input').value = di;
+  saveMeta();
+}
+
+function toggleOkCard(pid) {
+  const st = getPedidoState(pid);
+  st.ok = !st.ok;
+  savePedido();
+  const el = document.getElementById('card-ok-'+pid);
+  if (el) { el.classList.toggle('checked', st.ok); el.textContent = st.ok ? '✓' : '○'; }
+}
+
+// Keep cloud dots in sync everywhere (header + mobile status + drawer)
+function syncAllCloudDots() {
+  const dots  = ['cloud-dot','cloud-dot-m','cloud-dot-drawer'];
+  const labels= ['cloud-label','cloud-label-m','cloud-label-drawer'];
+  // Read state from main dot class
+  const mainDot = document.getElementById('cloud-dot');
+  const state = mainDot ? (mainDot.classList.contains('online') ? 'online' : mainDot.classList.contains('syncing') ? 'syncing' : mainDot.classList.contains('error') ? 'error' : '') : '';
+  const mainLabel = document.getElementById('cloud-label')?.textContent || 'Sin conexión';
+  dots.forEach(id => { const el = document.getElementById(id); if(el){ el.className='cloud-dot '+(state||''); } });
+  labels.forEach(id => { const el = document.getElementById(id); if(el) el.textContent = mainLabel; });
+  // FAB cloud
+  const fabCloud = document.getElementById('fab-cloud');
+  if (fabCloud) fabCloud.style.display = CLOUD.enabled ? '' : 'none';
+}
+
+// Patch setPedidoQty to also refresh card bottom visibility
+const _origSetPedidoQty = setPedidoQty;
+function setPedidoQty(pid, val) {
+  _origSetPedidoQty(pid, val);
+  // Show/hide card bottom row when qty gets filled/cleared
+  const cb = document.getElementById('card-bottom-'+pid);
+  if (cb) cb.classList.toggle('card-bottom-hidden', !val.trim());
+  // Update card class
+  const card = document.getElementById('card-'+pid);
+  if (card) { card.classList.toggle('has-pedido', !!val.trim()); }
+}
+
+// Patch setCloudDot to also update mobile dots
+const _origSetCloudDot = setCloudDot;
+function setCloudDot(state) {
+  _origSetCloudDot(state);
+  syncAllCloudDots();
 }
 
 // ─── START ───
