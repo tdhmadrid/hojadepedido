@@ -479,14 +479,18 @@ td{padding:7px 10px;vertical-align:middle;}
       <div class="cloud-section">
         <div class="cloud-section-title">Cambiar API Key / Bin</div>
         <div class="form-group" style="margin-bottom:8px;">
-          <label class="form-label">API Key</label>
-          <input type="password" class="form-input" id="cloud-apikey-input" placeholder="$2b$10$...">
+          <label class="form-label">API Key <span id="key-preview" style="color:var(--text-muted);font-family:'DM Mono',monospace;font-size:10px;"></span></label>
+          <input type="password" class="form-input" id="cloud-apikey-input" placeholder="$2b$10$..." oninput="previewKey(this.value)">
+          <div class="form-hint">Pégala completa — verifica que no tenga espacios al inicio o al final</div>
         </div>
         <div class="form-group" style="margin-bottom:8px;">
           <label class="form-label">Bin ID</label>
-          <input type="text" class="form-input" id="cloud-binid-input" placeholder="67abc123...">
+          <input type="text" class="form-input" id="cloud-binid-input" placeholder="67abc123... (vacío = crear nuevo)">
         </div>
-        <button class="btn btn-ghost btn-sm" onclick="updateCloudCreds()">Actualizar credenciales</button>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-ghost btn-sm" onclick="updateCloudCreds()">Guardar credenciales</button>
+          <button class="btn btn-ghost btn-sm" onclick="testConnection()">🔌 Probar conexión</button>
+        </div>
       </div>
 
       <div class="cloud-section">
@@ -2167,13 +2171,19 @@ async function cloudPush() {
   setCloudDot('syncing');
   cloudLog('Guardando en la nube…','info');
 
+  // Trim key just in case it was copied with spaces/newlines
+  const key = CLOUD.apiKey.trim();
+
   try {
     let currentCloud = {};
 
     // If we have a bin, fetch current state first to merge other roles' data
     if (CLOUD.binId) {
       const fetchRes = await fetch(`${JSONBIN_BASE}/b/${CLOUD.binId}/latest`, {
-        headers: { 'X-Master-Key': CLOUD.apiKey }
+        headers: {
+          'X-Master-Key': key,
+          'X-Access-Key': key,
+        }
       });
       if (fetchRes.ok) {
         const fetchData = await fetchRes.json();
@@ -2193,7 +2203,11 @@ async function cloudPush() {
       // Update existing bin
       res = await fetch(`${JSONBIN_BASE}/b/${CLOUD.binId}`, {
         method: 'PUT',
-        headers: { 'Content-Type':'application/json', 'X-Master-Key': CLOUD.apiKey },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Master-Key': key,
+          'X-Access-Key': key,
+        },
         body: JSON.stringify(currentCloud),
       });
     } else {
@@ -2201,24 +2215,28 @@ async function cloudPush() {
       res = await fetch(`${JSONBIN_BASE}/b`, {
         method: 'POST',
         headers: {
-          'Content-Type':'application/json',
-          'X-Master-Key': CLOUD.apiKey,
-          'X-Bin-Name': 'botanero-pedidos',
-          'X-Bin-Private': 'true',
+          'Content-Type': 'application/json',
+          'X-Master-Key': key,
+          'X-Access-Key': key,
+          'X-Bin-Name':   'botanero-pedidos',
+          'X-Bin-Private':'true',
         },
         body: JSON.stringify(currentCloud),
       });
     }
 
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (!res.ok) {
+      const errBody = await res.text().catch(()=>'');
+      throw new Error(`HTTP ${res.status} — ${errBody.slice(0,120)}`);
+    }
     const data = await res.json();
 
     // Save bin ID if new
     if (!CLOUD.binId) {
-      CLOUD.binId = data.metadata?.id || data.metadata?.Id;
+      CLOUD.binId = data.metadata?.id || data.metadata?.Id || data.metadata?.binId;
       localStorage.setItem('ba_cloud_bin', CLOUD.binId);
       cloudLog(`Bin creado: ${CLOUD.binId}`,'ok');
-      showToast(`Bin creado: ${CLOUD.binId} — compártelo con el equipo`,'success');
+      showToast(`¡Bin creado! ID: ${CLOUD.binId} — cópialo para compartir`, 'success');
     }
 
     CLOUD.lastSync = Date.now();
@@ -2251,11 +2269,19 @@ async function cloudPull() {
   setCloudDot('syncing');
   cloudLog('Cargando desde la nube…','info');
 
+  const key = CLOUD.apiKey.trim();
+
   try {
     const res = await fetch(`${JSONBIN_BASE}/b/${CLOUD.binId}/latest`, {
-      headers: { 'X-Master-Key': CLOUD.apiKey }
+      headers: {
+        'X-Master-Key': key,
+        'X-Access-Key': key,
+      }
     });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (!res.ok) {
+      const errBody = await res.text().catch(()=>'');
+      throw new Error(`HTTP ${res.status} — ${errBody.slice(0,120)}`);
+    }
     const data = await res.json();
     const record = data.record;
     if (!record || !record.roles) throw new Error('Formato inesperado');
@@ -2340,15 +2366,78 @@ function copyBinId() {
   });
 }
 
+function previewKey(val) {
+  const el = document.getElementById('key-preview');
+  if (!el) return;
+  const v = val.trim();
+  if (!v) { el.textContent = ''; return; }
+  el.textContent = `${v.slice(0,8)}…${v.slice(-4)} (${v.length} chars)`;
+}
+
+async function testConnection() {
+  const key = (document.getElementById('cloud-apikey-input').value || CLOUD.apiKey || '').trim();
+  const bin = (document.getElementById('cloud-binid-input').value || CLOUD.binId || '').trim();
+
+  if (!key) { cloudLog('✗ No hay API Key configurada','err'); showToast('Falta la API Key','error'); return; }
+
+  cloudLog(`Probando conexión… key: ${key.slice(0,8)}…${key.slice(-4)} (${key.length} chars)`,'info');
+
+  // Test 1: verify key by listing bins (simple auth check)
+  try {
+    const r1 = await fetch('https://api.jsonbin.io/v3/b', {
+      method: 'GET',
+      headers: { 'X-Master-Key': key }
+    });
+    cloudLog(`GET /b → ${r1.status} ${r1.statusText}`,'info');
+    if (r1.status === 401) {
+      const body = await r1.json().catch(()=>({}));
+      cloudLog(`✗ 401 — ${body.message||'API Key inválida o incorrecta'}`, 'err');
+      showToast('API Key inválida — revisa que la copiaste completa', 'error');
+      return;
+    }
+    if (r1.ok) cloudLog('✓ Autenticación correcta','ok');
+  } catch(e) {
+    cloudLog(`✗ Error de red: ${e.message}`,'err');
+    showToast('Error de red — ¿hay conexión a internet?','error');
+    return;
+  }
+
+  // Test 2: if bin ID provided, try to read it
+  if (bin) {
+    try {
+      const r2 = await fetch(`https://api.jsonbin.io/v3/b/${bin}/latest`, {
+        headers: { 'X-Master-Key': key, 'X-Access-Key': key }
+      });
+      cloudLog(`GET /b/${bin} → ${r2.status} ${r2.statusText}`,'info');
+      if (r2.ok) cloudLog('✓ Bin accesible correctamente','ok');
+      else {
+        const body = await r2.json().catch(()=>({}));
+        cloudLog(`✗ ${r2.status} — ${body.message||'Bin no accesible'}`, 'err');
+      }
+    } catch(e) {
+      cloudLog(`✗ Error leyendo bin: ${e.message}`,'err');
+    }
+  } else {
+    cloudLog('ℹ Sin Bin ID — se creará al primer guardado','info');
+  }
+
+  showToast('Test completado — revisa el registro abajo');
+}
+
 function updateCloudCreds() {
   const key = document.getElementById('cloud-apikey-input').value.trim();
   const bin = document.getElementById('cloud-binid-input').value.trim();
   if (key) { CLOUD.apiKey = key; localStorage.setItem('ba_cloud_key', key); }
-  if (bin) { CLOUD.binId  = bin; localStorage.setItem('ba_cloud_bin',  bin); }
+  if (bin !== undefined) {
+    CLOUD.binId = bin || null;
+    if (bin) localStorage.setItem('ba_cloud_bin', bin);
+    else localStorage.removeItem('ba_cloud_bin');
+  }
   CLOUD.enabled = !!(CLOUD.apiKey);
   document.getElementById('btn-cloud-save').style.display = CLOUD.enabled ? '' : 'none';
   updateCloudUI();
-  showToast('Credenciales actualizadas ✓','success');
+  cloudLog(`Credenciales actualizadas — key: ${(CLOUD.apiKey||'').slice(0,8)}…`, 'ok');
+  showToast('Credenciales guardadas ✓','success');
   if (CLOUD.enabled && CLOUD.binId) cloudPull();
 }
 
