@@ -2471,6 +2471,9 @@ function applyRole() {
 
   // Cloud save button
   document.getElementById('btn-cloud-save').style.display = CLOUD.enabled ? '' : 'none';
+  // Show correct dot state on startup
+  const initState = CLOUD.enabled ? (CLOUD.lastSync ? 'online' : '') : '';
+  setCloudDot(initState);
   updateCloudUI();
 }
 
@@ -2510,48 +2513,61 @@ function cloudLog(msg, type='info') {
 }
 
 function setCloudDot(state) {
-  const dot   = document.getElementById('cloud-dot');
-  const label = document.getElementById('cloud-label');
-  if (!dot) return;
-  dot.className = 'cloud-dot ' + state;
-  const labels = { online:'Sincronizado', syncing:'Sincronizando…', error:'Error de sync', '':'Sin conexión' };
-  label.textContent = CLOUD.lastSync
-    ? `Sync ${new Date(CLOUD.lastSync).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}`
-    : (labels[state] || 'Sin conexión');
+  // Update all dots everywhere at once
+  const ids = ['cloud-dot','cloud-dot-m','cloud-dot-drawer'];
+  ids.forEach(id => { const el = document.getElementById(id); if(el) el.className = 'cloud-dot ' + state; });
+
+  const ts = CLOUD.lastSync ? Number(CLOUD.lastSync) : null;
+  const timeStr = (ts && !isNaN(ts))
+    ? `Sync ${new Date(ts).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}`
+    : null;
+
+  const stateLabels = { online:'Conectado', syncing:'Sincronizando…', error:'Error', '':'Sin conexión' };
+  const labelText = timeStr || stateLabels[state] || 'Sin conexión';
+
+  ['cloud-label','cloud-label-m','cloud-label-drawer'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.textContent = labelText;
+  });
+
+  // FAB cloud visibility
+  const fabCloud = document.getElementById('fab-cloud');
+  if (fabCloud) fabCloud.style.display = CLOUD.enabled ? '' : 'none';
 }
 
 function updateCloudUI() {
-  document.getElementById('cloud-info-status').textContent  = CLOUD.enabled ? (CLOUD.binId ? '✓ Conectado' : 'Sin Bin ID') : 'Modo offline';
-  document.getElementById('cloud-info-role').textContent    = ROLES[currentRole]?.label || '—';
-  document.getElementById('cloud-info-binid').textContent   = CLOUD.binId || '—';
-  document.getElementById('cloud-info-lastsync').textContent= CLOUD.lastSync ? new Date(CLOUD.lastSync).toLocaleString('es-ES') : 'Nunca';
-  if (CLOUD.apiKey) document.getElementById('cloud-apikey-input').value = CLOUD.apiKey;
-  if (CLOUD.binId)  document.getElementById('cloud-binid-input').value  = CLOUD.binId;
+  const lastsync = document.getElementById('cloud-info-lastsync');
+  const ts = CLOUD.lastSync ? Number(CLOUD.lastSync) : null;
+  if (lastsync) lastsync.textContent = (ts && !isNaN(ts)) ? new Date(ts).toLocaleString('es-ES') : 'Nunca';
+
+  const status = document.getElementById('cloud-info-status');
+  if (status) status.textContent = CLOUD.enabled ? (CLOUD.binId ? '✓ Conectado' : 'Sin Bin ID aún') : 'Modo offline';
+
+  const roleEl = document.getElementById('cloud-info-role');
+  if (roleEl) roleEl.textContent = ROLES[currentRole]?.label || '—';
+
+  const binEl = document.getElementById('cloud-info-binid');
+  if (binEl) binEl.textContent = CLOUD.binId || '—';
+
+  const keyIn = document.getElementById('cloud-apikey-input');
+  const binIn = document.getElementById('cloud-binid-input');
+  if (keyIn && CLOUD.apiKey) keyIn.value = CLOUD.apiKey;
+  if (binIn && CLOUD.binId)  binIn.value  = CLOUD.binId;
 }
 
-// Build cloud payload — role-scoped
+// Build cloud payload — always saves complete state
 function buildCloudPayload() {
-  const role = ROLES[currentRole];
-  const payload = { v:2, ts: Date.now(), roles:{} };
-
-  // Each role writes only its own slice
-  payload.roles[currentRole] = {
-    data:   role.tabs.reduce((acc,t) => { acc[t]=DATA[t]; return acc; }, {}),
-    pedido: Object.fromEntries(
-      Object.entries(pedido).filter(([pid]) => {
-        // Only include products that belong to this role's tabs
-        const r = findProd(pid);
-        if (!r) return true; // keep unknown pids
-        return role.tabs.some(t => DATA[t]?.some(p => p.id === r.prov.id && p.productos.some(x=>x.id===pid)));
-      })
-    ),
+  return {
+    v: 2,
+    ts: Date.now(),
+    data: DATA,
+    pedido: pedido,
     meta: {
       fecha:       document.getElementById('fecha-input').value,
       responsable: document.getElementById('responsable-input').value,
       incidencias: document.getElementById('incidencias-input').value,
     },
+    savedBy: currentRole,
   };
-  return payload;
 }
 
 // ── PUSH (save to cloud) ──
@@ -2562,36 +2578,12 @@ async function cloudPush() {
   setCloudDot('syncing');
   cloudLog('Guardando en la nube…','info');
 
-  // Trim key just in case it was copied with spaces/newlines
   const key = CLOUD.apiKey.trim();
+  const payload = buildCloudPayload();
 
   try {
-    let currentCloud = {};
-
-    // If we have a bin, fetch current state first to merge other roles' data
-    if (CLOUD.binId) {
-      const fetchRes = await fetch(`${JSONBIN_BASE}/b/${CLOUD.binId}/latest`, {
-        headers: {
-          'X-Master-Key': key,
-          'X-Access-Key': key,
-        }
-      });
-      if (fetchRes.ok) {
-        const fetchData = await fetchRes.json();
-        currentCloud = fetchData.record || {};
-      }
-    }
-
-    // Merge: keep other roles' slices intact, write ours
-    const myPayload = buildCloudPayload();
-    if (!currentCloud.roles) currentCloud.roles = {};
-    currentCloud.roles[currentRole] = myPayload.roles[currentRole];
-    currentCloud.v  = 2;
-    currentCloud.ts = Date.now();
-
     let res;
     if (CLOUD.binId) {
-      // Update existing bin
       res = await fetch(`${JSONBIN_BASE}/b/${CLOUD.binId}`, {
         method: 'PUT',
         headers: {
@@ -2599,10 +2591,9 @@ async function cloudPush() {
           'X-Master-Key': key,
           'X-Access-Key': key,
         },
-        body: JSON.stringify(currentCloud),
+        body: JSON.stringify(payload),
       });
     } else {
-      // Create new bin
       res = await fetch(`${JSONBIN_BASE}/b`, {
         method: 'POST',
         headers: {
@@ -2612,7 +2603,7 @@ async function cloudPush() {
           'X-Bin-Name':   'botanero-pedidos',
           'X-Bin-Private':'true',
         },
-        body: JSON.stringify(currentCloud),
+        body: JSON.stringify(payload),
       });
     }
 
@@ -2622,7 +2613,6 @@ async function cloudPush() {
     }
     const data = await res.json();
 
-    // Save bin ID if new
     if (!CLOUD.binId) {
       CLOUD.binId = data.metadata?.id || data.metadata?.Id || data.metadata?.binId;
       localStorage.setItem('ba_cloud_bin', CLOUD.binId);
@@ -2631,7 +2621,7 @@ async function cloudPush() {
     }
 
     CLOUD.lastSync = Date.now();
-    localStorage.setItem('ba_cloud_lastsync', CLOUD.lastSync);
+    localStorage.setItem('ba_cloud_lastsync', String(CLOUD.lastSync));
     setCloudDot('online');
     cloudLog('✓ Guardado correctamente','ok');
     showToast('Guardado en la nube ✓','success');
@@ -2648,11 +2638,10 @@ async function cloudPush() {
 
 // ── PULL (load from cloud) ──
 async function cloudPull() {
-  if (!CLOUD.enabled || !CLOUD.apiKey || !CLOUD.binId) {
-    if (CLOUD.enabled && !CLOUD.binId) {
-      cloudLog('Sin Bin ID — se creará al guardar por primera vez','info');
-      setCloudDot('online');
-    }
+  if (!CLOUD.enabled || !CLOUD.apiKey) { return; }
+  if (!CLOUD.binId) {
+    cloudLog('Sin Bin ID — se creará al guardar por primera vez','info');
+    setCloudDot('online');
     return;
   }
   if (CLOUD.syncing) return;
@@ -2664,10 +2653,7 @@ async function cloudPull() {
 
   try {
     const res = await fetch(`${JSONBIN_BASE}/b/${CLOUD.binId}/latest`, {
-      headers: {
-        'X-Master-Key': key,
-        'X-Access-Key': key,
-      }
+      headers: { 'X-Master-Key': key, 'X-Access-Key': key }
     });
     if (!res.ok) {
       const errBody = await res.text().catch(()=>'');
@@ -2675,63 +2661,23 @@ async function cloudPull() {
     }
     const data = await res.json();
     const record = data.record;
-    if (!record || !record.roles) throw new Error('Formato inesperado');
+    if (!record) throw new Error('Respuesta vacía del servidor');
 
-    // Merge all roles' data into local state
-    const allRoles = Object.keys(record.roles);
-    allRoles.forEach(role => {
-      const slice = record.roles[role];
-      if (!slice) return;
+    // Simple full replace — cloud is source of truth on pull
+    if (record.data)   { DATA   = record.data;   saveData(); }
+    if (record.pedido) { pedido = record.pedido; savePedido(); }
+    if (record.meta) {
+      const m = record.meta;
+      if (m.fecha)       document.getElementById('fecha-input').value       = m.fecha;
+      if (m.responsable) document.getElementById('responsable-input').value = m.responsable;
+      if (m.incidencias) document.getElementById('incidencias-input').value = m.incidencias;
+      saveMeta();
+    }
 
-      // Merge DATA tabs
-      if (slice.data) {
-        Object.keys(slice.data).forEach(tab => {
-          if (!DATA[tab]) DATA[tab] = [];
-          slice.data[tab]?.forEach(incomingProv => {
-            const exists = DATA[tab].find(p=>p.id===incomingProv.id);
-            if (!exists) DATA[tab].push(incomingProv);
-            else {
-              // update provider info but keep local product edits
-              exists.nombre = incomingProv.nombre;
-              exists.schedule = incomingProv.schedule;
-              exists.telefono = incomingProv.telefono;
-              exists.color = incomingProv.color;
-              incomingProv.productos.forEach(ip => {
-                if (!exists.productos.find(p=>p.id===ip.id)) exists.productos.push(ip);
-              });
-            }
-          });
-        });
-      }
-
-      // Merge pedido from this role's slice
-      if (slice.pedido) {
-        Object.keys(slice.pedido).forEach(pid => {
-          if (!pedido[pid]) pedido[pid] = {};
-          const inc = slice.pedido[pid];
-          const cur = pedido[pid];
-          // Only fill blanks from cloud — local changes win
-          if (inc.qty && !cur.qty)                               cur.qty = inc.qty;
-          if (inc.ok)                                            cur.ok  = cur.ok || inc.ok;
-          if (inc.precio_override != null && cur.precio_override == null) cur.precio_override = inc.precio_override;
-          if (inc.recibido && !cur.recibido)                     cur.recibido = inc.recibido;
-        });
-      }
-
-      // Merge meta — use most recent (by ts)
-      if (slice.meta && record.ts > (CLOUD.lastSync||0)) {
-        const m = slice.meta;
-        if (m.fecha && !document.getElementById('fecha-input').value) document.getElementById('fecha-input').value = m.fecha;
-        if (m.responsable && !document.getElementById('responsable-input').value) document.getElementById('responsable-input').value = m.responsable;
-        if (m.incidencias && !document.getElementById('incidencias-input').value) document.getElementById('incidencias-input').value = m.incidencias;
-      }
-    });
-
-    saveData(); savePedido(); saveMeta();
     CLOUD.lastSync = Date.now();
-    localStorage.setItem('ba_cloud_lastsync', CLOUD.lastSync);
+    localStorage.setItem('ba_cloud_lastsync', String(CLOUD.lastSync));
     setCloudDot('online');
-    cloudLog('✓ Datos cargados correctamente','ok');
+    cloudLog(`✓ Datos cargados (guardado por: ${record.savedBy||'—'})`, 'ok');
     showToast('Datos cargados desde la nube ✓','success');
     renderFilterPills(); renderSections(); updateSummary(); updateBadges();
     updateCloudUI();
@@ -2918,38 +2864,20 @@ function toggleOkCard(pid) {
   if (el) { el.classList.toggle('checked', st.ok); el.textContent = st.ok ? '✓' : '○'; }
 }
 
-// Keep cloud dots in sync everywhere (header + mobile status + drawer)
+// Keep syncAllCloudDots as a simple alias (setCloudDot already updates all dots)
 function syncAllCloudDots() {
-  const dots  = ['cloud-dot','cloud-dot-m','cloud-dot-drawer'];
-  const labels= ['cloud-label','cloud-label-m','cloud-label-drawer'];
-  // Read state from main dot class
-  const mainDot = document.getElementById('cloud-dot');
-  const state = mainDot ? (mainDot.classList.contains('online') ? 'online' : mainDot.classList.contains('syncing') ? 'syncing' : mainDot.classList.contains('error') ? 'error' : '') : '';
-  const mainLabel = document.getElementById('cloud-label')?.textContent || 'Sin conexión';
-  dots.forEach(id => { const el = document.getElementById(id); if(el){ el.className='cloud-dot '+(state||''); } });
-  labels.forEach(id => { const el = document.getElementById(id); if(el) el.textContent = mainLabel; });
-  // FAB cloud
-  const fabCloud = document.getElementById('fab-cloud');
-  if (fabCloud) fabCloud.style.display = CLOUD.enabled ? '' : 'none';
+  const state = CLOUD.enabled ? (CLOUD.syncing ? 'syncing' : (CLOUD.lastSync ? 'online' : '')) : '';
+  setCloudDot(state);
 }
 
 // Patch setPedidoQty to also refresh card bottom visibility
 const _origSetPedidoQty = setPedidoQty;
 function setPedidoQty(pid, val) {
   _origSetPedidoQty(pid, val);
-  // Show/hide card bottom row when qty gets filled/cleared
   const cb = document.getElementById('card-bottom-'+pid);
   if (cb) cb.classList.toggle('card-bottom-hidden', !val.trim());
-  // Update card class
   const card = document.getElementById('card-'+pid);
-  if (card) { card.classList.toggle('has-pedido', !!val.trim()); }
-}
-
-// Patch setCloudDot to also update mobile dots
-const _origSetCloudDot = setCloudDot;
-function setCloudDot(state) {
-  _origSetCloudDot(state);
-  syncAllCloudDots();
+  if (card) card.classList.toggle('has-pedido', !!val.trim());
 }
 
 // ─── START ───
