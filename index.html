@@ -66,6 +66,7 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 .tab{padding:11px 20px;font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;border-bottom:2px solid transparent;color:var(--text-dim);transition:all .15s;}
 .tab.active-cocina{border-color:var(--accent);color:var(--accent);}
 .tab.active-sala{border-color:var(--blue);color:var(--blue);}
+.tab.active-barra{border-color:var(--green);color:var(--green);}
 .tab:hover{color:var(--text);}
 .tab-badge{display:inline-flex;align-items:center;justify-content:center;background:var(--surface2);color:var(--text-dim);font-size:10px;min-width:18px;height:18px;border-radius:9px;margin-left:5px;font-family:'DM Mono',monospace;padding:0 4px;}
 .tabs-right{display:flex;gap:6px;padding:6px 0;}
@@ -215,6 +216,212 @@ td{padding:7px 10px;vertical-align:middle;}
 .drawer-btn.accent{ background:var(--accent); color:#0f0e0d; border-color:var(--accent); }
 .drawer-btn.green{ background:var(--green); color:#0f0e0d; border-color:var(--green); }
 .drawer-divider{ border:none; border-top:1px solid var(--border); }
+
+/* ─── ALERTAS STOCK ─── */
+.alert-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  background:var(--red);color:#fff;font-size:10px;font-weight:700;
+  min-width:17px;height:17px;border-radius:9px;padding:0 4px;
+  position:absolute;top:-5px;right:-7px;line-height:1;
+  pointer-events:none;
+}
+.alert-btn-wrap{ position:relative;display:inline-flex; }
+.stock-alert-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;border-bottom:1px solid var(--border);gap:10px;
+}
+.stock-alert-row:last-child{ border-bottom:none; }
+.stock-alert-name{ font-weight:600;font-size:13px; }
+.stock-alert-meta{ font-size:11px;color:var(--text-dim);margin-top:2px; }
+.stock-alert-badge{
+  font-family:'DM Mono',monospace;font-size:11px;font-weight:700;
+  padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0;
+}
+.stock-alert-badge.bajo{ background:var(--red-dim);color:var(--red);border:1px solid var(--red); }
+.stock-alert-badge.critico{ background:rgba(224,85,85,.25);color:var(--red);border:1px solid var(--red); }
+.stock-min-input{
+  width:72px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);
+  padding:4px 8px;border-radius:4px;font-family:'DM Mono',monospace;font-size:12px;
+  text-align:center;outline:none;
+}
+.stock-min-input:focus{ border-color:var(--accent); }
+.stock-min-row{
+  display:flex;align-items:center;gap:8px;padding:8px 14px;
+  border-bottom:1px solid var(--border);font-size:12px;
+}
+.stock-min-row:last-child{ border-bottom:none; }
+.stock-min-name{ flex:1;font-weight:500; }
+.stock-min-fmt{ font-size:10px;color:var(--text-dim);min-width:70px; }
+
+/* ─── ADMIN QUICKBAR ─── */
+#admin-quickbar{ display:none; }  /* JS lo muestra */
+.admin-quick-btn{
+  display:flex;flex-direction:column;align-items:flex-start;gap:1px;
+  padding:9px 14px;border-radius:var(--radius);
+  background:var(--surface2);border:1px solid var(--border2);
+  color:var(--text);cursor:pointer;transition:all .15s;text-align:left;
+  min-width:150px;flex:1;
+}
+.admin-quick-btn:hover{ background:var(--surface3);border-color:var(--accent); }
+.admin-quick-btn span{ font-size:13px;font-weight:600; }
+.admin-quick-btn small{ font-size:10px;color:var(--text-dim);font-weight:400; }
+
+/* ─── PERMISOS DE PEDIDO ─── */
+.perm-prov-header{
+  padding:8px 14px;background:var(--surface2);
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.9px;
+  color:var(--text-muted);border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:1;
+}
+.perm-row{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 16px;border-bottom:1px solid var(--border);
+  transition:background .1s;
+}
+.perm-row:hover{ background:var(--surface2); }
+.perm-row.blocked{ opacity:.45; }
+.perm-desc{ flex:1;font-size:13px;color:var(--text); }
+.perm-fmt{ font-size:11px;color:var(--text-muted);margin-left:6px; }
+/* Toggle switch */
+.perm-toggle{
+  position:relative;width:38px;height:22px;flex-shrink:0;cursor:pointer;
+}
+.perm-toggle input{ opacity:0;width:0;height:0;position:absolute; }
+.perm-slider{
+  position:absolute;inset:0;background:var(--border2);border-radius:11px;
+  transition:background .2s;
+}
+.perm-slider::before{
+  content:'';position:absolute;width:16px;height:16px;
+  left:3px;top:3px;background:#fff;border-radius:50%;
+  transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.3);
+}
+.perm-toggle input:checked + .perm-slider{ background:var(--green); }
+.perm-toggle input:checked + .perm-slider::before{ transform:translateX(16px); }
+
+/* Row bloqueada en renderSections */
+.prod-row-blocked{ opacity:.38;pointer-events:none; }
+.prod-card-blocked{ opacity:.38;pointer-events:none; }
+.blocked-badge{
+  display:inline-block;font-size:9px;font-weight:700;
+  background:var(--border2);color:var(--text-muted);
+  border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:middle;
+  letter-spacing:.5px;
+}
+
+/* ─── CONSUMOS BARRA ─── */
+.consumo-row{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 14px;border-bottom:1px solid var(--border);
+  font-size:12px;
+}
+.consumo-row:last-child{ border-bottom:none; }
+.consumo-avatar{
+  width:30px;height:30px;border-radius:50%;background:var(--surface3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:var(--accent);flex-shrink:0;
+  font-family:'DM Mono',monospace;
+}
+.consumo-info{ flex:1;min-width:0; }
+.consumo-empleado{ font-weight:600;font-size:13px;color:var(--text); }
+.consumo-detalle{ color:var(--text-dim);margin-top:2px;line-height:1.4; }
+.consumo-qty{ font-family:'DM Mono',monospace;font-weight:700;color:var(--accent);white-space:nowrap; }
+.consumo-ts{ font-size:10px;color:var(--text-muted);white-space:nowrap;margin-top:3px; }
+.consumo-del{
+  background:transparent;border:none;color:var(--text-muted);
+  cursor:pointer;font-size:14px;padding:3px 6px;border-radius:4px;
+  flex-shrink:0;transition:color .12s;
+}
+.consumo-del:hover{ color:var(--red); }
+.consumo-form{
+  padding:14px 16px;background:var(--surface2);border-bottom:1px solid var(--border);
+  display:flex;flex-direction:column;gap:10px;
+}
+.consumo-form-row{ display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end; }
+.consumo-field{ display:flex;flex-direction:column;gap:4px;flex:1;min-width:120px; }
+.consumo-field label{ font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted); }
+.consumo-field input,.consumo-field select{
+  background:var(--surface);border:1px solid var(--border2);color:var(--text);
+  padding:8px 10px;border-radius:var(--radius);font-size:13px;font-family:'DM Sans',sans-serif;
+  outline:none;width:100%;
+}
+.consumo-field input:focus,.consumo-field select:focus{ border-color:var(--accent); }
+.consumo-field select option{ background:var(--surface); }
+.consumo-empty{ padding:28px;text-align:center;color:var(--text-dim);font-size:13px; }
+
+/* ─── CONSUMO PERSONAL ─── */
+.cp-prod-card{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;border:1px solid var(--border2);border-radius:var(--radius);
+  background:var(--surface2);cursor:pointer;transition:all .15s;
+}
+.cp-prod-card:hover{ background:var(--surface3);border-color:var(--accent); }
+.cp-prod-card.selected{
+  background:rgba(var(--accent-rgb),.1);border-color:var(--accent);
+  box-shadow:0 0 0 2px rgba(var(--accent-rgb),.2);
+}
+.cp-prod-icon{ font-size:22px;flex-shrink:0; }
+.cp-prod-info{ flex:1;min-width:0; }
+.cp-prod-nombre{ font-size:13px;font-weight:600;color:var(--text); }
+.cp-prod-fmt{ font-size:11px;color:var(--text-dim); }
+.cp-prod-limite{ font-size:11px;padding:2px 8px;border-radius:10px;background:var(--surface3);color:var(--text-muted);flex-shrink:0; }
+.cp-prod-agotado{ font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(var(--red-rgb),.12);color:var(--red);flex-shrink:0; }
+.consumo-config-row{
+  display:flex;align-items:center;gap:10px;padding:10px 16px;
+  border-bottom:1px solid var(--border);
+}
+.consumo-config-row:last-child{ border-bottom:none; }
+.consumo-config-row:hover{ background:var(--surface2); }
+.cc-info{ flex:1;min-width:0; }
+.cc-nombre{ font-size:13px;font-weight:500;color:var(--text); }
+.cc-fmt{ font-size:11px;color:var(--text-muted); }
+.cc-limite-input{
+  width:66px;background:var(--surface);border:1px solid var(--border2);color:var(--text);
+  padding:6px 8px;border-radius:var(--radius);font-size:12px;text-align:center;
+  font-family:'DM Mono',monospace;
+}
+.cc-limite-input:focus{ border-color:var(--accent);outline:none; }
+.cc-limite-label{ font-size:11px;color:var(--text-muted);white-space:nowrap; }
+
+/* ─── CONTEO BARRA ─── */
+.barra-section{margin-bottom:16px;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.barra-header{
+  padding:10px 14px;background:var(--surface);display:flex;
+  align-items:center;justify-content:space-between;
+  font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;
+  cursor:pointer;user-select:none;
+}
+.barra-body{ overflow-x:auto; }
+.barra-row{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 14px;border-bottom:1px solid var(--border);
+  font-size:12px;transition:background .1s;
+}
+.barra-row:last-child{ border-bottom:none; }
+.barra-row:hover{ background:rgba(255,255,255,.02); }
+.barra-name{ flex:1;font-weight:500; }
+.barra-fmt{ font-size:11px;color:var(--text-dim);min-width:90px; }
+.barra-stock-input{
+  width:72px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);
+  padding:5px 8px;border-radius:4px;font-family:'DM Mono',monospace;font-size:13px;
+  text-align:center;outline:none;transition:border-color .15s;
+}
+.barra-stock-input:focus{ border-color:var(--blue); }
+.barra-stock-input.ok{ border-color:var(--green);color:var(--green);background:rgba(76,175,125,.08); }
+.barra-stock-input.bajo{ border-color:#e8c820;color:#e8c820;background:rgba(232,200,32,.07); }
+.barra-stock-input.critico{ border-color:var(--red);color:var(--red);background:var(--red-dim); }
+.barra-min-wrap{ display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text-muted); }
+.barra-min-input{
+  width:52px;background:transparent;border:1px dashed var(--border2);color:var(--text-muted);
+  padding:3px 6px;border-radius:4px;font-family:'DM Mono',monospace;font-size:10px;
+  text-align:center;outline:none;
+}
+.barra-min-input:focus{ border-color:var(--text-dim);color:var(--text); }
+.barra-status{ font-size:9px;text-transform:uppercase;letter-spacing:.5px;min-width:46px;text-align:right; }
+.barra-toolbar{
+  display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;
+}
+#barra-content{ padding:16px 20px;max-width:900px;margin:0 auto; }
 
 /* ═══════════════════════════════════════
    MOBILE CARDS (≤768px)
@@ -692,6 +899,10 @@ td{padding:7px 10px;vertical-align:middle;}
         <button class="drawer-btn" onclick="openSyncModal();closeDrawer()" style="margin-top:6px">⇄ Sincronizar local</button>
         <button class="drawer-btn" id="drawer-provs-btn" onclick="openManageProvs();closeDrawer()" style="margin-top:6px">⚙ Proveedores</button>
         <button class="drawer-btn" onclick="openAddProv();closeDrawer()" style="margin-top:6px">+ Nuevo proveedor</button>
+        <button class="drawer-btn" id="drawer-alertas-btn" onclick="openAlertasModal();closeDrawer()" style="margin-top:6px;display:none">🔔 Alertas de stock <span id="alert-badge-drawer" style="background:var(--red);color:#fff;border-radius:9px;padding:1px 7px;font-size:11px;font-weight:700;margin-left:auto;display:none">0</span></button>
+        <button class="drawer-btn" id="drawer-barra-btn" onclick="openBarraConteo();closeDrawer()" style="margin-top:6px;display:none">🍹 Conteo de barra</button>
+        <button class="drawer-btn" id="drawer-consumos-btn" onclick="openConsumosPersonal();closeDrawer()" style="margin-top:4px;display:none">📋 Consumos de empleados</button>
+        <button class="drawer-btn" id="drawer-permisos-btn" onclick="openPermisosModal();closeDrawer()" style="margin-top:4px;display:none">🔐 Qué puede pedir cada rol</button>
         <button class="drawer-btn" onclick="closeDrawer();clearPedido()" style="margin-top:6px;color:var(--red);border-color:var(--red);">🗑 Limpiar pedido</button>
       </div>
       <hr class="drawer-divider">
@@ -729,6 +940,10 @@ td{padding:7px 10px;vertical-align:middle;}
         <div class="cloud-dot" id="cloud-dot-m"></div>
         <span id="cloud-label-m" style="font-size:10px;color:var(--text-dim)">Offline</span>
       </div>
+      <div class="alert-btn-wrap" id="alert-btn-wrap-mobile" style="display:none">
+        <button class="btn btn-ghost btn-icon" onclick="openAlertasModal()" title="Alertas" style="padding:8px 10px;font-size:16px;">🔔</button>
+        <span class="alert-badge" id="alert-badge-mobile" style="display:none">0</span>
+      </div>
       <button class="mobile-hamburger" onclick="openDrawer()">☰</button>
     </div>
   </div>
@@ -759,7 +974,11 @@ td{padding:7px 10px;vertical-align:middle;}
     <button class="btn btn-ghost" id="btn-manage-provs" onclick="openManageProvs()">⚙ Proveedores</button>
     <button class="btn btn-ghost" onclick="openSyncModal()">⇄ Local</button>
     <button class="btn btn-ghost" onclick="clearPedido()">🗑 Limpiar</button>
-    <button class="btn btn-green" id="btn-cloud-save" onclick="cloudPush()" style="display:none">☁ Guardar</button>
+    <div class="alert-btn-wrap" id="alert-btn-wrap-desktop" style="display:none">
+      <button class="btn btn-ghost btn-icon" onclick="openAlertasModal()" title="Alertas de stock">🔔</button>
+      <span class="alert-badge" id="alert-badge-desktop" style="display:none">0</span>
+    </div>
+    <button class="btn btn-ghost" id="btn-cloud-save" onclick="cloudPush()" style="display:none">☁ Guardar</button>
     <button class="btn btn-accent" onclick="openExportModal()">↗ Exportar</button>
   </div>
 </header>
@@ -776,15 +995,38 @@ td{padding:7px 10px;vertical-align:middle;}
   <div class="tabs-left">
     <div class="tab" id="tab-cocina" onclick="setTab('cocina')">🍳 Cocina <span class="tab-badge" id="badge-cocina">0</span></div>
     <div class="tab" id="tab-sala" onclick="setTab('sala')">🍹 Sala <span class="tab-badge" id="badge-sala">0</span></div>
+    <div class="tab" id="tab-barra" onclick="setTab('barra')" style="display:none">🍹 Barra</div>
   </div>
   <div class="tabs-right">
-    <button class="btn btn-ghost btn-sm" onclick="openAddProv()">+ Proveedor</button>
+    <button class="btn btn-ghost btn-sm" id="tabs-add-prov-btn" onclick="openAddProv()">+ Proveedor</button>
     <button class="btn btn-ghost btn-sm" onclick="scrollToNext()">⬇ Siguiente</button>
+    <button class="btn btn-sm" id="tabs-limpiar-btn" onclick="clearPedido()" style="color:var(--red);border:1px solid var(--red);background:transparent;">🗑 Limpiar lista</button>
   </div>
 </div>
 
 <!-- MAIN -->
 <div class="main" id="main-content">
+
+  <!-- ── PANEL ACCESO RÁPIDO GERENTE ── -->
+  <div id="admin-quickbar" style="display:none;padding:10px 16px 0;gap:8px;flex-wrap:wrap;">
+    <button class="admin-quick-btn" onclick="openPermisosModal()">
+      🔐 <span>Permisos de pedido</span>
+      <small>Qué puede pedir cada rol</small>
+    </button>
+    <button class="admin-quick-btn" onclick="openAlertasModal()">
+      🔔 <span>Alertas de stock</span>
+      <small>Mínimos y avisos</small>
+    </button>
+    <button class="admin-quick-btn" onclick="openConsumosPersonal()">
+      📋 <span>Consumos empleados</span>
+      <small>Registrar lo que tomaron</small>
+    </button>
+    <button class="admin-quick-btn" onclick="openBarraConteo()">
+      🍹 <span>Conteo de barra</span>
+      <small>Inventario actual</small>
+    </button>
+  </div>
+
   <div class="toolbar">
     <div class="search-wrap">
       <span class="search-icon">🔍</span>
@@ -1170,6 +1412,181 @@ td{padding:7px 10px;vertical-align:middle;}
   </div>
 </div>
 
+<!-- ─── MODAL ALERTAS DE STOCK ─── -->
+<div class="modal-overlay" id="modal-alertas">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-header">
+      <span class="modal-title">🔔 Alertas de Stock</span>
+      <button class="modal-close" onclick="closeModal('modal-alertas')">✕</button>
+    </div>
+    <div class="modal-body" style="padding:0;">
+      <!-- tabs internas -->
+      <div style="display:flex;border-bottom:1px solid var(--border);">
+        <div id="atab-alertas" onclick="setAlertasTab('alertas')" style="flex:1;padding:11px;text-align:center;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;border-bottom:2px solid var(--accent);color:var(--accent);">⚠ Alertas activas</div>
+        <div id="atab-config" onclick="setAlertasTab('config')" style="flex:1;padding:11px;text-align:center;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;border-bottom:2px solid transparent;color:var(--text-dim);">⚙ Configurar mínimos</div>
+      </div>
+      <!-- panel alertas -->
+      <div id="apanel-alertas" style="max-height:380px;overflow-y:auto;">
+        <div id="alertas-list"></div>
+      </div>
+      <!-- panel config -->
+      <div id="apanel-config" style="display:none;max-height:380px;overflow-y:auto;">
+        <div style="padding:10px 14px;font-size:11px;color:var(--text-dim);background:var(--surface2);border-bottom:1px solid var(--border);">
+          Define la cantidad mínima de stock para recibir aviso. Deja en blanco para desactivar la alerta del producto.
+        </div>
+        <div id="alertas-config-list"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-alertas')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── MODAL PERMISOS DE PEDIDO ─── -->
+<div class="modal-overlay" id="modal-permisos">
+  <div class="modal" style="max-width:620px;max-height:90vh;display:flex;flex-direction:column;">
+    <div class="modal-header">
+      <span class="modal-title">🔐 Permisos de pedido</span>
+      <button class="modal-close" onclick="closeModal('modal-permisos')">✕</button>
+    </div>
+    <!-- Tabs rol -->
+    <div style="display:flex;border-bottom:2px solid var(--border);background:var(--surface2);">
+      <button id="ptab-cocina" onclick="setPermisosTab('cocina')"
+        style="padding:10px 20px;font-size:13px;font-weight:600;border:none;background:transparent;
+               color:var(--accent);border-bottom:2px solid var(--accent);margin-bottom:-2px;cursor:pointer;">
+        🍳 Cocina
+      </button>
+      <button id="ptab-sala" onclick="setPermisosTab('sala')"
+        style="padding:10px 20px;font-size:13px;font-weight:600;border:none;background:transparent;
+               color:var(--text-dim);border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer;">
+        🍹 Sala
+      </button>
+    </div>
+    <div style="padding:10px 16px;font-size:11px;color:var(--text-dim);background:var(--surface2);border-bottom:1px solid var(--border);">
+      Activa o desactiva productos para cada rol. Los productos desactivados aparecen bloqueados y no pueden pedirse.
+    </div>
+    <!-- Toolbar select all / search -->
+    <div style="padding:10px 16px;display:flex;gap:8px;align-items:center;border-bottom:1px solid var(--border);">
+      <input id="permisos-search" type="text" placeholder="Buscar producto…"
+        oninput="renderPermisosList()"
+        style="flex:1;background:var(--surface);border:1px solid var(--border2);color:var(--text);
+               padding:7px 10px;border-radius:var(--radius);font-size:12px;outline:none;">
+      <button class="btn btn-ghost btn-sm" onclick="permisosSelectAll(true)" title="Activar todos">✓ Todos</button>
+      <button class="btn btn-ghost btn-sm" onclick="permisosSelectAll(false)" title="Desactivar todos">✗ Ninguno</button>
+    </div>
+    <div id="permisos-list" style="overflow-y:auto;flex:1;"></div>
+    <div class="modal-footer" style="justify-content:flex-end;">
+      <button class="btn btn-ghost" onclick="closeModal('modal-permisos')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── MODAL CONTEO DE BARRA ─── -->
+<div class="modal-overlay" id="modal-barra">
+  <div class="modal" style="max-width:700px;max-height:92vh;display:flex;flex-direction:column;">
+    <div class="modal-header">
+      <span class="modal-title">🍹 Conteo de Stock — Barra</span>
+      <button class="modal-close" onclick="closeModal('modal-barra')">✕</button>
+    </div>
+    <div class="modal-body" style="padding:0;overflow-y:auto;flex:1;">
+      <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--border);background:var(--surface2);">
+        <span style="font-size:11px;color:var(--text-dim);">Conteo rápido de inventario de barra. Los datos se guardan localmente.</span>
+        <button class="btn btn-ghost btn-sm" onclick="exportBarraConteo()">⬇ Exportar TXT</button>
+        <button class="btn btn-danger btn-sm" onclick="resetBarraConteo()">🗑 Resetear conteo</button>
+      </div>
+      <div id="barra-conteo-container" style="padding:0;"></div>
+    </div>
+    <div class="modal-footer" style="justify-content:space-between;align-items:center;">
+      <span id="barra-conteo-resumen" style="font-size:12px;color:var(--text-dim);"></span>
+      <button class="btn btn-ghost" onclick="closeModal('modal-barra')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── MODAL CONSUMO PERSONAL ─── -->
+<div class="modal-overlay" id="modal-consumos-personal">
+  <div class="modal" style="max-width:680px;max-height:92vh;display:flex;flex-direction:column;">
+    <div class="modal-header">
+      <span class="modal-title">🥤 Consumo del personal</span>
+      <button class="modal-close" onclick="closeModal('modal-consumos-personal')">✕</button>
+    </div>
+    <!-- Tabs -->
+    <div style="display:flex;border-bottom:2px solid var(--border);background:var(--surface2);">
+      <button id="ctab-registrar" onclick="setConsumosTab('registrar')"
+        style="padding:10px 18px;font-size:13px;font-weight:600;border:none;background:transparent;
+               color:var(--accent);border-bottom:2px solid var(--accent);margin-bottom:-2px;cursor:pointer;">
+        ➕ Registrar
+      </button>
+      <button id="ctab-historial" onclick="setConsumosTab('historial')"
+        style="padding:10px 18px;font-size:13px;font-weight:600;border:none;background:transparent;
+               color:var(--text-dim);border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer;">
+        📋 Historial
+      </button>
+      <button id="ctab-config" onclick="setConsumosTab('config')"
+        style="padding:10px 18px;font-size:13px;font-weight:600;border:none;background:transparent;
+               color:var(--text-dim);border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer;display:none">
+        ⚙ Configurar
+      </button>
+    </div>
+
+    <!-- ── PANEL REGISTRAR ── -->
+    <div id="cpanel-registrar" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+      <div style="padding:14px 16px;font-size:11px;color:var(--text-dim);background:var(--surface2);border-bottom:1px solid var(--border);">
+        Registra lo que tomaste del local. Solo aparecen los productos autorizados por el gerente.
+      </div>
+      <!-- Productos permitidos como tarjetas -->
+      <div id="consumo-productos-grid" style="overflow-y:auto;flex:1;padding:12px 16px;display:flex;flex-direction:column;gap:10px;"></div>
+      <!-- Formulario confirmación -->
+      <div id="consumo-confirm-bar" style="display:none;padding:12px 16px;border-top:1px solid var(--border);background:var(--surface2);">
+        <div style="font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:.7px;">Confirmar consumo</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
+          <div class="consumo-field" style="min-width:140px;flex:1;">
+            <label>Tu nombre</label>
+            <input type="text" id="cp-empleado" placeholder="¿Quién eres?" onkeydown="if(event.key==='Enter')confirmarConsumoPersonal()">
+          </div>
+          <div id="cp-producto-info" style="flex:2;min-width:140px;padding:8px 12px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);font-size:13px;"></div>
+          <div class="consumo-field" style="max-width:90px;">
+            <label>Cantidad</label>
+            <input type="number" id="cp-cantidad" min="1" step="1" value="1" style="text-align:center;" onkeydown="if(event.key==='Enter')confirmarConsumoPersonal()">
+          </div>
+          <button class="btn btn-primary" onclick="confirmarConsumoPersonal()">✓ Confirmar</button>
+          <button class="btn btn-ghost" onclick="cancelarSeleccionConsumo()">✗</button>
+        </div>
+        <div id="cp-limite-info" style="font-size:11px;color:var(--text-dim);margin-top:6px;"></div>
+      </div>
+      <div class="modal-footer" style="justify-content:flex-end;">
+        <button class="btn btn-ghost" onclick="closeModal('modal-consumos-personal')">Cerrar</button>
+      </div>
+    </div>
+
+    <!-- ── PANEL HISTORIAL ── -->
+    <div id="cpanel-historial" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+      <div style="padding:8px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);background:var(--surface2);">
+        <span style="font-size:11px;color:var(--text-dim);flex:1;" id="historial-subtitle">Consumos de hoy</span>
+        <button class="btn btn-ghost btn-sm" onclick="exportConsumos()">⬇ Exportar</button>
+        <button class="btn btn-danger btn-sm" id="historial-reset-btn" style="display:none" onclick="resetConsumos()">🗑 Limpiar</button>
+      </div>
+      <div id="consumos-list" style="overflow-y:auto;flex:1;"></div>
+      <div class="modal-footer" style="justify-content:space-between;">
+        <span id="consumos-resumen" style="font-size:12px;color:var(--text-dim);"></span>
+        <button class="btn btn-ghost" onclick="closeModal('modal-consumos-personal')">Cerrar</button>
+      </div>
+    </div>
+
+    <!-- ── PANEL CONFIGURAR (solo Gerente) ── -->
+    <div id="cpanel-config" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+      <div style="padding:10px 16px;font-size:11px;color:var(--text-dim);background:var(--surface2);border-bottom:1px solid var(--border);">
+        Activa los productos que el personal puede consumir y define un límite diario por producto (0 = sin límite).
+      </div>
+      <div id="consumos-config-list" style="overflow-y:auto;flex:1;"></div>
+      <div class="modal-footer" style="justify-content:flex-end;">
+        <button class="btn btn-ghost" onclick="closeModal('modal-consumos-personal')">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════════════════════════════════════════════════════
   DATA + STATE
 ══════════════════════════════════════════════════════════════════ -->
@@ -1505,8 +1922,22 @@ function getPrecio(pid) {
 function setTab(tab) {
   currentTab = tab;
   activeFilter = 'todos';
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active-cocina','active-sala'));
-  document.getElementById('tab-'+tab).classList.add('active-'+tab);
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active-cocina','active-sala','active-barra'));
+  const tabEl = document.getElementById('tab-'+tab);
+  if(tabEl) tabEl.classList.add('active-'+tab);
+
+  const mainContent = document.getElementById('main-content');
+  // Si es pestaña barra, abrir el modal de conteo y volver a sala
+  if (tab === 'barra') {
+    // reset tab visual a sala o cocina y abrir modal
+    currentTab = ROLES[currentRole]?.tabs[0] || 'sala';
+    const resetEl = document.getElementById('tab-'+currentTab);
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active-cocina','active-sala','active-barra'));
+    if(resetEl) resetEl.classList.add('active-'+currentTab);
+    openBarraConteo();
+    return;
+  }
+
   renderFilterPills();
   renderSections();
   updateSummary();
@@ -1532,6 +1963,7 @@ function renderSections() {
   const container = document.getElementById('sections-container');
   const search = (document.getElementById('search-input').value||'').toLowerCase();
   const provs = DATA[currentTab]||[];
+  const canSeePrices = !!(ROLES[currentRole]?.canSeePrices);
   let html = '';
   let anyVisible = false;
 
@@ -1567,6 +1999,7 @@ function renderSections() {
     let tableRows = '';
     prods.forEach(p => {
       const st = pedido[p.id]||{qty:'',ok:false,recibido:'',precio_override:null};
+      const allowed   = canOrder(currentRole, p.id);
       const hasQty = !!(st.qty); const hasRec = !!(st.recibido);
       const precioEff = getPrecio(p.id);
       const qtyNum = num(st.qty); const recNum = num(st.recibido);
@@ -1578,20 +2011,22 @@ function renderSections() {
         else { diffText = (d > 0 ? '+' : '') + d.toFixed(2); diffClass = d > 0 ? 'pos' : 'neg'; }
       }
       let rowClass = '';
-      if (hasQty) rowClass = 'has-pedido';
+      if (!allowed) rowClass = 'prod-row-blocked';
+      else if (hasQty) rowClass = 'has-pedido';
       if (hasRec && diffClass === 'ok') rowClass = 'recibido';
       if (hasRec && diffClass === 'pos') rowClass = 'diferencia-pos';
       if (hasRec && diffClass === 'neg') rowClass = 'diferencia-neg';
 
+      const blockedBadge = !allowed ? '<span class="blocked-badge">🔒 bloqueado</span>' : '';
       tableRows += `<tr class="${rowClass}" id="row-${p.id}">
-        <td><div class="td-desc">${p.desc}</div><div class="td-fmt">${p.formato}</div></td>
+        <td><div class="td-desc">${p.desc}${blockedBadge}</div><div class="td-fmt">${p.formato}</div></td>
         <td class="td-par col-hide-tablet">${p.par||'—'}</td>
-        <td><input type="text" class="qty-input ${hasQty?'filled':''}" value="${st.qty||''}" placeholder="${p.par||''}" data-id="${p.id}" onchange="setPedidoQty('${p.id}',this.value)" oninput="setPedidoQty('${p.id}',this.value)"></td>
-        <td class="col-hide-tablet"><div class="price-edit-wrap"><input type="number" step="0.01" class="price-edit-input" value="${precioEff!=null?precioEff:''}" placeholder="€" onchange="setPrecioOverride('${p.id}',this.value)" style="color:${precioEff!=null?'var(--green)':'var(--text-muted)'}"></div></td>
+        <td><input type="text" class="qty-input ${hasQty?'filled':''}" value="${st.qty||''}" placeholder="${allowed?(p.par||''):'—'}" data-id="${p.id}" ${allowed?`onchange="setPedidoQty('${p.id}',this.value)" oninput="setPedidoQty('${p.id}',this.value)"`:'readonly'} ${!allowed?'style="opacity:.3;cursor:not-allowed"':''}></td>
+        ${canSeePrices ? `<td class="col-hide-tablet"><div class="price-edit-wrap"><input type="number" step="0.01" class="price-edit-input" value="${precioEff!=null?precioEff:''}" placeholder="€" onchange="setPrecioOverride('${p.id}',this.value)" style="color:${precioEff!=null?'var(--green)':'var(--text-muted)'}"></div></td>` : ''}
         <td><input type="text" class="rec-input ${hasRec?'filled':''}" value="${st.recibido||''}" placeholder="—" onchange="setRecibido('${p.id}',this.value)" oninput="setRecibido('${p.id}',this.value)"></td>
         <td class="td-diff ${diffClass}">${diffText}</td>
         <td><input type="checkbox" class="ok-check" ${st.ok?'checked':''} onchange="setOk('${p.id}',this.checked)"></td>
-        <td class="td-sub ${subtotal?'active':''} col-hide-tablet">${subtotal!=null?`€${subtotal.toFixed(2)}`:'—'}</td>
+        ${canSeePrices ? `<td class="td-sub ${subtotal?'active':''} col-hide-tablet">${subtotal!=null?`€${subtotal.toFixed(2)}`:'—'}</td>` : ''}
       </tr>`;
     });
 
@@ -1599,6 +2034,7 @@ function renderSections() {
     let cardRows = '';
     prods.forEach(p => {
       const st = pedido[p.id]||{qty:'',ok:false,recibido:'',precio_override:null};
+      const allowed   = canOrder(currentRole, p.id);
       const hasQty = !!(st.qty); const hasRec = !!(st.recibido);
       const precioEff = getPrecio(p.id);
       const qtyNum = num(st.qty); const recNum = num(st.recibido);
@@ -1610,23 +2046,26 @@ function renderSections() {
         else { diffText = (d > 0 ? '+' : '') + d.toFixed(2); diffClass = d > 0 ? 'pos' : 'neg'; }
       }
       let cardClass = '';
-      if (hasQty) cardClass = 'has-pedido';
-      if (hasRec && diffClass === 'ok') cardClass = 'recibido';
-      if (hasRec && diffClass === 'pos') cardClass = 'diferencia-pos';
-      if (hasRec && diffClass === 'neg') cardClass = 'diferencia-neg';
+      if (!allowed) cardClass = 'prod-card-blocked';
+      else if (hasQty) cardClass = 'has-pedido';
+      if (allowed && hasRec && diffClass === 'ok') cardClass = 'recibido';
+      if (allowed && hasRec && diffClass === 'pos') cardClass = 'diferencia-pos';
+      if (allowed && hasRec && diffClass === 'neg') cardClass = 'diferencia-neg';
 
+      const blockedLabel = !allowed ? '<span class="blocked-badge">🔒 bloqueado</span>' : '';
       cardRows += `<div class="prod-card ${cardClass}" id="card-${p.id}">
         <div class="card-left">
-          <div class="card-name">${p.desc}</div>
+          <div class="card-name">${p.desc} ${blockedLabel}</div>
           <div class="card-meta">
             <span class="card-formato">${p.formato}</span>
             ${p.par ? `<span class="card-par">${p.par}</span>` : ''}
-            ${precioEff != null ? `<span class="card-precio">€${precioEff.toFixed(2)}</span>` : ''}
+            ${(canSeePrices && precioEff != null) ? `<span class="card-precio">€${precioEff.toFixed(2)}</span>` : ''}
           </div>
         </div>
         <div class="card-right">
-          <input type="text" inputmode="decimal" class="card-qty ${hasQty?'filled':''}" value="${st.qty||''}" placeholder="—"
-            onchange="setPedidoQty('${p.id}',this.value)" oninput="setPedidoQty('${p.id}',this.value)">
+          <input type="text" inputmode="decimal" class="card-qty ${hasQty?'filled':''}" value="${st.qty||''}" placeholder="${allowed?'—':'🔒'}"
+            ${allowed?`onchange="setPedidoQty('${p.id}',this.value)" oninput="setPedidoQty('${p.id}',this.value)"`:'readonly'}
+            ${!allowed?'style="opacity:.3;cursor:not-allowed"':''}>
           ${diffText ? `<span class="card-diff ${diffClass}">${diffText}</span>` : ''}
         </div>
         <div class="card-bottom ${!hasQty?'card-bottom-hidden':''}" id="card-bottom-${p.id}">
@@ -1636,7 +2075,7 @@ function renderSections() {
           <div class="card-ok ${st.ok?'checked':''}" id="card-ok-${p.id}" onclick="toggleOkCard('${p.id}')">
             ${st.ok ? '✓' : '○'}
           </div>
-          ${subtotal ? `<span class="card-sub">€${subtotal.toFixed(2)}</span>` : ''}
+          ${(canSeePrices && subtotal) ? `<span class="card-sub">€${subtotal.toFixed(2)}</span>` : ''}
         </div>
       </div>`;
     });
@@ -1652,7 +2091,7 @@ function renderSections() {
         <div class="prov-stats">
           <span style="font-size:11px">${prods.length} prod.</span>
           ${pedidoCount?`<span class="stat-items">${pedidoCount} ped.</span>`:''}
-          ${totalEst?`<span class="stat-est">≈€${totalEst.toFixed(2)}</span>`:''}
+          ${(canSeePrices && totalEst)?`<span class="stat-est">≈€${totalEst.toFixed(2)}</span>`:''}
           ${diffCount?`<span class="stat-diff over">⚠${diffCount}</span>`:''}
           <button class="btn btn-ghost btn-sm prov-edit-btn" style="margin-left:4px" onclick="event.stopPropagation();openEditProv('${prov.id}')">✏</button>
           <span class="chevron">▼</span>
@@ -1662,8 +2101,10 @@ function renderSections() {
         <table>
           <thead><tr>
             <th>Producto</th><th class="c col-hide-tablet">Parámetro</th><th class="c">Pedido</th>
-            <th class="c col-hide-tablet">Precio</th><th class="c">Recibido</th>
-            <th class="c">Diferencia</th><th class="c">OK</th><th class="r col-hide-tablet">Subtotal</th>
+            ${canSeePrices ? '<th class="c col-hide-tablet">Precio</th>' : ''}
+            <th class="c">Recibido</th>
+            <th class="c">Diferencia</th><th class="c">OK</th>
+            ${canSeePrices ? '<th class="r col-hide-tablet">Subtotal</th>' : ''}
           </tr></thead>
           <tbody>${tableRows}</tbody>
         </table>
@@ -2492,9 +2933,9 @@ function confirmImport() {
 //  ROLES + LOGIN
 // ═══════════════════════════════════════════════
 const ROLES = {
-  gerente: { label:'👔 Gerente', tabs:['cocina','sala'], canEdit:true,  canManageProvs:true },
-  cocina:  { label:'🍳 Cocina',  tabs:['cocina'],        canEdit:true,  canManageProvs:false },
-  sala:    { label:'🍹 Sala',    tabs:['sala'],           canEdit:true,  canManageProvs:false },
+  gerente: { label:'👔 Gerente', tabs:['cocina','sala'], canEdit:true,  canManageProvs:true,  canSeePrices:true  },
+  cocina:  { label:'🍳 Cocina',  tabs:['cocina'],        canEdit:true,  canManageProvs:false, canSeePrices:false },
+  sala:    { label:'🍹 Sala',    tabs:['sala'],           canEdit:true,  canManageProvs:false, canSeePrices:false },
 };
 
 let currentRole = null;
@@ -2558,8 +2999,27 @@ function applyRole() {
   const btnManage = document.getElementById('btn-manage-provs');
   if (btnManage) btnManage.style.display = role.canManageProvs ? '' : 'none';
 
+  // Alertas + Barra: solo Gerente
+  const isGerente = currentRole === 'gerente';
+  ['alert-btn-wrap-desktop','alert-btn-wrap-mobile'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.style.display = isGerente ? '' : 'none';
+  });
+  // Botones solo para Gerente
+  ['drawer-alertas-btn','drawer-barra-btn','drawer-permisos-btn'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.style.display = isGerente ? '' : 'none';
+  });
+  // Consumos: visible para todos los roles
+  const dConsumosBtn = document.getElementById('drawer-consumos-btn');
+  if (dConsumosBtn) dConsumosBtn.style.display = '';
+  const tabBarra = document.getElementById('tab-barra');
+  if(tabBarra) tabBarra.style.display = isGerente ? '' : 'none';
+  // Panel acceso rápido gerente
+  const qb = document.getElementById('admin-quickbar');
+  if(qb) { qb.style.display = isGerente ? 'flex' : 'none'; }
+  if(isGerente) { updateAlertBadge(); }
+
   // Set default tab to first allowed
-  if (!role.tabs.includes(currentTab)) setTab(role.tabs[0]);
+  if (!role.tabs.includes(currentTab) && currentTab !== 'barra') setTab(role.tabs[0]);
   else setTab(currentTab);
 
   // Cloud save button + FAB
@@ -2722,6 +3182,14 @@ async function cloudPush() {
     cloudLog('✓ Guardado correctamente','ok');
     showToast('Guardado en la nube ✓','success');
     updateCloudUI();
+    // Preguntar si limpiar pedido para el siguiente ciclo
+    setTimeout(() => {
+      const hasPedido = Object.values(pedido).some(s => s.qty && s.qty !== '');
+      if (hasPedido && confirm('¿Deseas limpiar el pedido actual para iniciar uno nuevo?\n\n(Los proveedores y precios se conservan)')) {
+        pedido = {}; savePedido(); renderSections(); updateSummary(); updateBadges();
+        showToast('Pedido limpiado — listo para el siguiente','success');
+      }
+    }, 400);
 
   } catch(err) {
     setCloudDot('error');
@@ -2881,6 +3349,11 @@ function init() {
   DATA = savedData ? JSON.parse(savedData) : JSON.parse(JSON.stringify(INITIAL_DATA));
   const savedPedido = localStorage.getItem('ba_pedido');
   pedido = savedPedido ? JSON.parse(savedPedido) : {};
+  loadStockMinimos();
+  loadPermisos();
+  loadBarraState();
+  loadConsumos();
+  loadConsumosConfig();
   const savedMeta = localStorage.getItem('ba_meta');
   if (savedMeta) {
     const m = JSON.parse(savedMeta);
@@ -3063,6 +3536,751 @@ function descargarMensajeTxt() {
   a.download = `pedido_mensaje_${fecha}.txt`;
   a.click();
   showToast('Descargado ✓','success');
+}
+
+// ═══════════════════════════════════════════════
+//  ALERTAS DE STOCK (solo Gerente)
+// ═══════════════════════════════════════════════
+
+let stockMinimos = {}; // { pid: minimo_num }
+let permisos     = {}; // { cocina: { pid: false }, sala: { pid: false } }  false = bloqueado
+let currentPermisosTab = 'cocina';
+
+function saveStockMinimos() { localStorage.setItem('ba_stock_min', JSON.stringify(stockMinimos)); }
+function loadStockMinimos() {
+  const s = localStorage.getItem('ba_stock_min');
+  stockMinimos = s ? JSON.parse(s) : {};
+}
+
+// ─── PERMISOS ───
+function savePermisos() { localStorage.setItem('ba_permisos', JSON.stringify(permisos)); }
+function loadPermisos() {
+  const s = localStorage.getItem('ba_permisos');
+  permisos = s ? JSON.parse(s) : {};
+}
+/** true = puede pedir, false/undefined en key = SÍ puede (allow by default) */
+function canOrder(role, pid) {
+  const rolePerms = permisos[role];
+  if (!rolePerms) return true;
+  return rolePerms[pid] !== false;
+}
+
+function getStockActual(pid) {
+  // Stock actual viene del conteo de barra o de la recepción del pedido
+  const barraState = getBarraState();
+  if (barraState[pid] !== undefined && barraState[pid] !== '') return parseFloat(String(barraState[pid]).replace(',','.')) || 0;
+  // Si no hay conteo de barra, revisar recibido en pedido
+  const st = pedido[pid];
+  if (st && st.recibido && st.recibido !== '') return parseFloat(String(st.recibido).replace(',','.')) || 0;
+  return null; // sin dato
+}
+
+function getAlertasActivas() {
+  const alertas = [];
+  ['cocina','sala'].forEach(tab => {
+    (DATA[tab]||[]).forEach(prov => {
+      prov.productos.forEach(p => {
+        const min = stockMinimos[p.id];
+        if (min == null) return;
+        const actual = getStockActual(p.id);
+        if (actual === null) return; // sin dato de stock, no alertar
+        if (actual <= min) {
+          alertas.push({ pid:p.id, desc:p.desc, formato:p.formato, prov:prov.nombre, actual, min, tab });
+        }
+      });
+    });
+  });
+  // Ordenar: crítico primero (actual=0), luego por distancia al mínimo
+  alertas.sort((a,b) => (a.actual/a.min) - (b.actual/b.min));
+  return alertas;
+}
+
+function updateAlertBadge() {
+  if (currentRole !== 'gerente') return;
+  const alertas = getAlertasActivas();
+  const count = alertas.length;
+  ['alert-badge-desktop','alert-badge-mobile'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = count; el.style.display = count > 0 ? '' : 'none'; }
+  });
+  const drawerBadge = document.getElementById('alert-badge-drawer');
+  if(drawerBadge){ drawerBadge.textContent = count; drawerBadge.style.display = count > 0 ? '' : 'none'; }
+}
+
+function openAlertasModal() {
+  setAlertasTab('alertas');
+  openModal('modal-alertas');
+}
+
+let _alertasTab = 'alertas';
+function setAlertasTab(tab) {
+  _alertasTab = tab;
+  document.getElementById('apanel-alertas').style.display = tab === 'alertas' ? '' : 'none';
+  document.getElementById('apanel-config').style.display = tab === 'config' ? '' : 'none';
+  document.getElementById('atab-alertas').style.borderBottomColor = tab === 'alertas' ? 'var(--accent)' : 'transparent';
+  document.getElementById('atab-alertas').style.color = tab === 'alertas' ? 'var(--accent)' : 'var(--text-dim)';
+  document.getElementById('atab-config').style.borderBottomColor = tab === 'config' ? 'var(--accent)' : 'transparent';
+  document.getElementById('atab-config').style.color = tab === 'config' ? 'var(--accent)' : 'var(--text-dim)';
+  if (tab === 'alertas') renderAlertasList();
+  else renderAlertasConfig();
+}
+
+function renderAlertasList() {
+  const alertas = getAlertasActivas();
+  const el = document.getElementById('alertas-list');
+  if (!alertas.length) {
+    el.innerHTML = `<div style="padding:32px;text-align:center;color:var(--text-dim);">
+      <div style="font-size:32px;margin-bottom:8px;">✅</div>
+      <div style="font-weight:600;margin-bottom:4px;">Todo en orden</div>
+      <div style="font-size:12px;">No hay productos por debajo del stock mínimo.</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML = alertas.map(a => {
+    const pct = a.min > 0 ? (a.actual / a.min) : 1;
+    const cls = a.actual === 0 ? 'critico' : 'bajo';
+    const label = a.actual === 0 ? '¡AGOTADO!' : `${a.actual} / mín ${a.min}`;
+    return `<div class="stock-alert-row">
+      <div>
+        <div class="stock-alert-name">${a.desc}</div>
+        <div class="stock-alert-meta">${a.prov} · ${a.formato} · ${a.tab === 'cocina' ? '🍳 Cocina' : '🍹 Sala'}</div>
+      </div>
+      <span class="stock-alert-badge ${cls}">${label}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderAlertasConfig() {
+  const el = document.getElementById('alertas-config-list');
+  let html = '';
+  ['cocina','sala'].forEach(tab => {
+    (DATA[tab]||[]).forEach(prov => {
+      html += `<div style="padding:6px 14px;background:var(--surface2);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);font-weight:700;border-bottom:1px solid var(--border);">${prov.nombre} · ${tab === 'cocina' ? '🍳' : '🍹'}</div>`;
+      prov.productos.forEach(p => {
+        const min = stockMinimos[p.id] != null ? stockMinimos[p.id] : '';
+        html += `<div class="stock-min-row">
+          <span class="stock-min-name">${p.desc}</span>
+          <span class="stock-min-fmt">${p.formato}</span>
+          <input type="number" class="stock-min-input" value="${min}" placeholder="—" min="0" step="0.5"
+            onchange="setStockMin('${p.id}', this.value)" title="Stock mínimo">
+        </div>`;
+      });
+    });
+  });
+  el.innerHTML = html || '<div style="padding:20px;color:var(--text-dim)">Sin productos.</div>';
+}
+
+function setStockMin(pid, val) {
+  if (val === '' || val == null) { delete stockMinimos[pid]; }
+  else { stockMinimos[pid] = parseFloat(String(val).replace(',','.')) || 0; }
+  saveStockMinimos();
+  updateAlertBadge();
+}
+
+// ═══════════════════════════════════════════════
+//  CONTEO DE STOCK — BARRA (solo Gerente)
+// ═══════════════════════════════════════════════
+
+let barraConteo = {}; // { pid: stock_actual }
+let consumosLog  = []; // [{ ts, empleado, pid, desc, cantidad, formato }]
+let consumosConfig = {}; // { pid: { permitido: bool, limite_dia: number|null } }
+let currentBarraTab = 'conteo';
+let currentConsumosTab = 'registrar';
+let selectedConsumosPid = null; // pid del producto seleccionado en panel registrar
+
+function saveBarraState() { localStorage.setItem('ba_barra', JSON.stringify(barraConteo)); }
+function getBarraState() { return barraConteo; }
+
+function loadBarraState() {
+  const s = localStorage.getItem('ba_barra');
+  barraConteo = s ? JSON.parse(s) : {};
+}
+
+function loadConsumos() {
+  const s = localStorage.getItem('ba_consumos');
+  consumosLog = s ? JSON.parse(s) : [];
+}
+
+function openBarraConteo() {
+  renderBarraConteo();
+  openModal('modal-barra');
+}
+
+function setBarraTab(tab) {
+  // solo queda un panel (conteo), función mantenida por compatibilidad
+  currentBarraTab = 'conteo';
+  renderBarraConteo();
+}
+
+function renderBarraConteo() {
+  const container = document.getElementById('barra-conteo-container');
+  const salaProv = DATA['sala'] || [];
+  let html = '';
+  let totalItems = 0, contadosItems = 0;
+
+  salaProv.forEach(prov => {
+    if (!prov.productos.length) return;
+    html += `<div class="barra-section">
+      <div class="barra-header" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? '' : 'none'">
+        <span>${prov.nombre}</span>
+        <span style="font-size:12px;color:var(--text-dim);">${prov.productos.length} prod. ▼</span>
+      </div>
+      <div class="barra-body">`;
+
+    prov.productos.forEach(p => {
+      totalItems++;
+      const val = barraConteo[p.id] !== undefined ? barraConteo[p.id] : '';
+      if (val !== '') contadosItems++;
+      const min = stockMinimos[p.id];
+      const valNum = parseFloat(String(val).replace(',','.'));
+      let inputClass = 'barra-stock-input';
+      let statusText = '—';
+      if (val !== '' && !isNaN(valNum)) {
+        if (min != null) {
+          if (valNum === 0) { inputClass += ' critico'; statusText = 'AGOTADO'; }
+          else if (valNum <= min) { inputClass += ' bajo'; statusText = `min:${min}`; }
+          else { inputClass += ' ok'; statusText = 'OK'; }
+        } else {
+          inputClass += ' ok'; statusText = 'OK';
+        }
+      }
+      html += `<div class="barra-row">
+        <span class="barra-name">${p.desc}</span>
+        <span class="barra-fmt">${p.formato}</span>
+        <div class="barra-min-wrap" title="Stock mínimo">
+          <span style="font-size:9px">mín:</span>
+          <input type="number" class="barra-min-input" value="${min != null ? min : ''}" placeholder="—" min="0" step="0.5"
+            onchange="setStockMin('${p.id}', this.value); renderBarraConteo();" title="Stock mínimo">
+        </div>
+        <input type="number" class="${inputClass}" value="${val}" placeholder="—" min="0" step="0.5"
+          id="barra-inp-${p.id}"
+          oninput="setBarraStock('${p.id}',this.value); recolorBarra('${p.id}');"
+          onchange="setBarraStock('${p.id}',this.value); recolorBarra('${p.id}'); renderBarraResumen();"
+          title="Stock actual">
+        <span class="barra-status" id="barra-st-${p.id}" style="color:${statusText==='AGOTADO'?'var(--red)':statusText==='OK'?'var(--green)':statusText.startsWith('min')?'#e8c820':'var(--text-muted)'}">${statusText}</span>
+      </div>`;
+    });
+
+    html += `</div></div>`;
+  });
+
+  if (!salaProv.length) {
+    html = `<div style="padding:32px;text-align:center;color:var(--text-dim);">No hay proveedores en Sala aún.</div>`;
+  }
+
+  container.innerHTML = html;
+  renderBarraResumen();
+}
+
+function recolorBarra(pid) {
+  const inp = document.getElementById('barra-inp-'+pid);
+  const stEl = document.getElementById('barra-st-'+pid);
+  if (!inp || !stEl) return;
+  const val = inp.value;
+  const valNum = parseFloat(String(val).replace(',','.'));
+  const min = stockMinimos[pid];
+  inp.className = 'barra-stock-input';
+  if (val !== '' && !isNaN(valNum)) {
+    if (min != null) {
+      if (valNum === 0) { inp.classList.add('critico'); stEl.textContent='AGOTADO'; stEl.style.color='var(--red)'; }
+      else if (valNum <= min) { inp.classList.add('bajo'); stEl.textContent=`min:${min}`; stEl.style.color='#e8c820'; }
+      else { inp.classList.add('ok'); stEl.textContent='OK'; stEl.style.color='var(--green)'; }
+    } else { inp.classList.add('ok'); stEl.textContent='OK'; stEl.style.color='var(--green)'; }
+  } else { stEl.textContent='—'; stEl.style.color='var(--text-muted)'; }
+}
+
+function setBarraStock(pid, val) {
+  if (val === '' || val == null) delete barraConteo[pid];
+  else barraConteo[pid] = val;
+  saveBarraState();
+  updateAlertBadge();
+}
+
+function renderBarraResumen() {
+  const salaProv = DATA['sala']||[];
+  let total = 0, contados = 0, alertas = 0;
+  salaProv.forEach(prov => prov.productos.forEach(p => {
+    total++;
+    const v = barraConteo[p.id];
+    if (v !== undefined && v !== '') {
+      contados++;
+      const vn = parseFloat(String(v).replace(',','.'));
+      const m = stockMinimos[p.id];
+      if (m != null && vn <= m) alertas++;
+    }
+  }));
+  const el = document.getElementById('barra-conteo-resumen');
+  if (el) el.textContent = `${contados}/${total} contados · ${alertas} alertas`;
+}
+
+function resetBarraConteo() {
+  if (!confirm('¿Resetear todo el conteo de barra?')) return;
+  barraConteo = {}; saveBarraState(); renderBarraConteo(); updateAlertBadge();
+  showToast('Conteo reseteado ✓','success');
+}
+
+function exportBarraConteo() {
+  const fecha = document.getElementById('fecha-input').value || new Date().toLocaleDateString('es-ES');
+  let txt = `CONTEO DE BARRA — BOTANERO AZTECA\nFecha: ${fecha}\n${'─'.repeat(44)}\n\n`;
+  (DATA['sala']||[]).forEach(prov => {
+    txt += `${prov.nombre.toUpperCase()}\n`;
+    prov.productos.forEach(p => {
+      const v = barraConteo[p.id];
+      const val = (v !== undefined && v !== '') ? v : '—';
+      const min = stockMinimos[p.id] != null ? `(mín: ${stockMinimos[p.id]})` : '';
+      const flag = (v !== undefined && v !== '' && stockMinimos[p.id] != null && parseFloat(String(v).replace(',','.')) <= stockMinimos[p.id]) ? ' ⚠' : '';
+      txt += `  ${p.desc.padEnd(30)} ${String(val).padStart(6)} ${p.formato}${flag} ${min}\n`;
+    });
+    txt += '\n';
+  });
+  const blob = new Blob([txt], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`conteo_barra_${fecha.replace(/\//g,'-')}.txt`; a.click();
+  showToast('Exportado ✓','success');
+}
+
+// ═══════════════════════════════════════════════
+//  PERMISOS DE PEDIDO (Gerente configura)
+// ═══════════════════════════════════════════════
+
+function openPermisosModal() {
+  setPermisosTab(currentPermisosTab || 'cocina', true);
+  openModal('modal-permisos');
+}
+
+function setPermisosTab(tab, silent) {
+  currentPermisosTab = tab;
+  ['cocina','sala'].forEach(t => {
+    const btn = document.getElementById(`ptab-${t}`);
+    if (!btn) return;
+    const active = t === tab;
+    btn.style.color = active ? 'var(--accent)' : 'var(--text-dim)';
+    btn.style.borderBottomColor = active ? 'var(--accent)' : 'transparent';
+  });
+  renderPermisosList();
+}
+
+function renderPermisosList() {
+  const tab       = currentPermisosTab;
+  const container = document.getElementById('permisos-list');
+  if (!container) return;
+  const search    = (document.getElementById('permisos-search')?.value || '').toLowerCase();
+  const provs     = DATA[tab] || [];
+  const rolePerms = permisos[tab] || {};
+
+  if (!provs.length) {
+    container.innerHTML = '<div style="padding:28px;text-align:center;color:var(--text-dim);font-size:13px;">No hay productos en esta sección.</div>';
+    return;
+  }
+
+  let html = '';
+  provs.forEach(prov => {
+    const prods = prov.productos.filter(p =>
+      !search || p.desc.toLowerCase().includes(search) || prov.nombre.toLowerCase().includes(search)
+    );
+    if (!prods.length) return;
+
+    html += `<div class="perm-prov-header">${prov.nombre}</div>`;
+    prods.forEach(p => {
+      const allowed = rolePerms[p.id] !== false;
+      html += `
+        <div class="perm-row${allowed ? '' : ' blocked'}" id="prow-${p.id}">
+          <div class="perm-desc">
+            ${escPerm(p.desc)}
+            <span class="perm-fmt">${escPerm(p.formato||'')}</span>
+          </div>
+          <label class="perm-toggle" title="${allowed ? 'Desactivar' : 'Activar'}">
+            <input type="checkbox" ${allowed ? 'checked' : ''}
+              onchange="togglePermiso('${tab}','${p.id}',this.checked)">
+            <span class="perm-slider"></span>
+          </label>
+        </div>`;
+    });
+  });
+
+  container.innerHTML = html || '<div style="padding:24px;text-align:center;color:var(--text-dim);font-size:13px;">Sin resultados.</div>';
+}
+
+function togglePermiso(tab, pid, allowed) {
+  if (!permisos[tab]) permisos[tab] = {};
+  if (allowed) {
+    delete permisos[tab][pid]; // allow by default = no entry needed
+  } else {
+    permisos[tab][pid] = false;
+  }
+  savePermisos();
+  // Actualiza clase visual sin re-render completo
+  const row = document.getElementById(`prow-${pid}`);
+  if (row) row.classList.toggle('blocked', !allowed);
+  // Si hay un pedido con ese pid y está bloqueado, limpiar qty
+  if (!allowed && pedido[pid] && pedido[pid].qty) {
+    pedido[pid].qty = '';
+    savePedido();
+  }
+  // Refrescar secciones si el tab afectado es el que se está viendo
+  if (tab === currentTab) renderSections();
+  showToast(allowed ? `✓ ${pid} activado` : `🔒 Producto bloqueado`, allowed ? 'success' : 'error');
+}
+
+function permisosSelectAll(allowed) {
+  const tab  = currentPermisosTab;
+  const provs = DATA[tab] || [];
+  if (!permisos[tab]) permisos[tab] = {};
+  provs.forEach(prov => prov.productos.forEach(p => {
+    if (allowed) { delete permisos[tab][p.id]; }
+    else         { permisos[tab][p.id] = false; }
+  }));
+  savePermisos();
+  if (!allowed) {
+    // Limpiar pedido para ese tab
+    provs.forEach(prov => prov.productos.forEach(p => {
+      if (pedido[p.id]) pedido[p.id].qty = '';
+    }));
+    savePedido();
+  }
+  if (tab === currentTab) renderSections();
+  renderPermisosList();
+  showToast(allowed ? 'Todos activados ✓' : 'Todos desactivados 🔒', allowed ? 'success' : 'error');
+}
+
+function escPerm(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ═══════════════════════════════════════════════
+//  CONSUMO PERSONAL — registro por empleado
+// ═══════════════════════════════════════════════
+
+function saveConsumos()       { localStorage.setItem('ba_consumos', JSON.stringify(consumosLog)); }
+function saveConsumosConfig() { localStorage.setItem('ba_consumos_config', JSON.stringify(consumosConfig)); }
+function loadConsumosConfig() {
+  const s = localStorage.getItem('ba_consumos_config');
+  consumosConfig = s ? JSON.parse(s) : {};
+}
+
+// Abre el modal de consumo personal (accesible por todos los roles)
+function openConsumosPersonal(tab) {
+  tab = tab || currentConsumosTab || 'registrar';
+  const ctabConfig = document.getElementById('ctab-config');
+  if (ctabConfig) ctabConfig.style.display = currentRole === 'gerente' ? '' : 'none';
+  const resetBtn = document.getElementById('historial-reset-btn');
+  if (resetBtn) resetBtn.style.display = currentRole === 'gerente' ? '' : 'none';
+  setConsumosTab(tab, true);
+  openModal('modal-consumos-personal');
+}
+
+function setConsumosTab(tab, silent) {
+  currentConsumosTab = tab;
+  const panels = { registrar:'cpanel-registrar', historial:'cpanel-historial', config:'cpanel-config' };
+  const tabs   = { registrar:'ctab-registrar',   historial:'ctab-historial',   config:'ctab-config'   };
+  Object.entries(panels).forEach(([key, panelId]) => {
+    const panel = document.getElementById(panelId);
+    const btn   = document.getElementById(tabs[key]);
+    if (!panel) return;
+    const active = key === tab;
+    panel.style.display        = active ? 'flex' : 'none';
+    if (btn) {
+      btn.style.color             = active ? 'var(--accent)' : 'var(--text-dim)';
+      btn.style.borderBottomColor = active ? 'var(--accent)' : 'transparent';
+    }
+  });
+  if (tab === 'registrar') renderConsumoProductos();
+  if (tab === 'historial') renderConsumosList();
+  if (tab === 'config')    renderConsumosConfig();
+}
+
+function getProductoInfo(pid) {
+  let found = null;
+  (DATA['sala'] || []).forEach(prov =>
+    prov.productos.forEach(p => { if (p.id === pid) found = p; })
+  );
+  return found;
+}
+
+function consumosHoyEmpleadoProd(empleado, pid) {
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  return consumosLog
+    .filter(c => c.pid === pid
+      && c.empleado.toLowerCase() === empleado.toLowerCase()
+      && new Date(c.ts) >= hoy)
+    .reduce((s, c) => s + (c.cantidad || 0), 0);
+}
+
+// ── Panel REGISTRAR ──
+function renderConsumoProductos() {
+  const grid = document.getElementById('consumo-productos-grid');
+  if (!grid) return;
+  const permitidos = [];
+  (DATA['sala'] || []).forEach(prov => {
+    prov.productos.forEach(p => {
+      const cfg = consumosConfig[p.id];
+      if (cfg && cfg.permitido) permitidos.push({ p, prov });
+    });
+  });
+  if (!permitidos.length) {
+    grid.innerHTML = `<div style="padding:32px;text-align:center;color:var(--text-dim);font-size:13px;">
+      ${currentRole === 'gerente'
+        ? '⚙ No hay productos autorizados aún. Ve a <b>Configurar</b> para activarlos.'
+        : '⚙ El gerente aún no ha configurado los productos permitidos.'}
+    </div>`;
+    cancelarSeleccionConsumo();
+    return;
+  }
+  const getEmoji = (desc) => {
+    const d = desc.toLowerCase();
+    if (d.includes('coca') || d.includes('pepsi') || d.includes('refresco') || d.includes('nestea')) return '🥤';
+    if (d.includes('agua')) return '💧';
+    if (d.includes('zumo') || d.includes('jugo') || d.includes('naranja') || d.includes('piña')) return '🍊';
+    if (d.includes('leche')) return '🥛';
+    if (d.includes('café') || d.includes('cafe')) return '☕';
+    if (d.includes('tónica') || d.includes('tonica') || d.includes('bitter')) return '🍾';
+    return '🥤';
+  };
+  grid.innerHTML = permitidos.map(({ p, prov }) => {
+    const cfg       = consumosConfig[p.id] || {};
+    const limiteTxt = cfg.limite_dia > 0 ? `Límite: ${cfg.limite_dia}/día` : 'Sin límite';
+    const emoji     = getEmoji(p.desc);
+    const selected  = selectedConsumosPid === p.id;
+    return `
+      <div class="cp-prod-card${selected?' selected':''}" id="cpcard-${p.id}" onclick="seleccionarConsumoProducto('${p.id}')">
+        <div class="cp-prod-icon">${emoji}</div>
+        <div class="cp-prod-info">
+          <div class="cp-prod-nombre">${esc(p.desc)}</div>
+          <div class="cp-prod-fmt">${esc(p.formato||'')} · ${esc(prov.nombre)}</div>
+        </div>
+        <span class="cp-prod-limite">${limiteTxt}</span>
+      </div>`;
+  }).join('');
+  if (selectedConsumosPid) updateConfirmBar();
+}
+
+function seleccionarConsumoProducto(pid) {
+  if (selectedConsumosPid) {
+    const prev = document.getElementById(`cpcard-${selectedConsumosPid}`);
+    if (prev) prev.classList.remove('selected');
+  }
+  selectedConsumosPid = pid;
+  const card = document.getElementById(`cpcard-${pid}`);
+  if (card) card.classList.add('selected');
+  updateConfirmBar();
+  setTimeout(() => {
+    const inp = document.getElementById('cp-empleado');
+    if (inp && !inp.value) inp.focus();
+  }, 50);
+}
+
+function updateConfirmBar() {
+  const bar    = document.getElementById('consumo-confirm-bar');
+  const info   = document.getElementById('cp-producto-info');
+  const limInfo= document.getElementById('cp-limite-info');
+  if (!bar || !selectedConsumosPid) { if (bar) bar.style.display='none'; return; }
+  const p   = getProductoInfo(selectedConsumosPid);
+  const cfg = consumosConfig[selectedConsumosPid] || {};
+  if (!p) { bar.style.display='none'; return; }
+  bar.style.display = '';
+  info.innerHTML = `<b>${esc(p.desc)}</b>${p.formato ? ` <span style="color:var(--text-muted);font-size:11px">(${esc(p.formato)})</span>` : ''}`;
+  const empleado = (document.getElementById('cp-empleado')?.value || '').trim();
+  if (empleado && cfg.limite_dia > 0) {
+    const yaUsado  = consumosHoyEmpleadoProd(empleado, selectedConsumosPid);
+    const restante = cfg.limite_dia - yaUsado;
+    if (restante <= 0) {
+      limInfo.innerHTML = `<span style="color:var(--red)">⚠ ${esc(empleado)} ya alcanzó su límite diario (${cfg.limite_dia}) de este producto.</span>`;
+    } else {
+      limInfo.textContent = `${empleado} puede tomar ${restante} más hoy (límite: ${cfg.limite_dia}/día)`;
+    }
+  } else if (cfg.limite_dia > 0) {
+    limInfo.textContent = `Límite: ${cfg.limite_dia} por persona por día`;
+  } else {
+    limInfo.textContent = 'Sin límite diario configurado';
+  }
+}
+
+function cancelarSeleccionConsumo() {
+  if (selectedConsumosPid) {
+    const prev = document.getElementById(`cpcard-${selectedConsumosPid}`);
+    if (prev) prev.classList.remove('selected');
+  }
+  selectedConsumosPid = null;
+  const bar = document.getElementById('consumo-confirm-bar');
+  if (bar) bar.style.display = 'none';
+}
+
+function confirmarConsumoPersonal() {
+  const empleado = (document.getElementById('cp-empleado')?.value || '').trim();
+  const cantEl   = document.getElementById('cp-cantidad');
+  const cant     = parseInt(cantEl?.value || '1', 10);
+  const pid      = selectedConsumosPid;
+  if (!empleado) { showToast('Escribe tu nombre','error'); document.getElementById('cp-empleado')?.focus(); return; }
+  if (!pid)      { showToast('Selecciona un producto','error'); return; }
+  if (!cant || cant <= 0) { showToast('Cantidad inválida','error'); cantEl?.focus(); return; }
+  const p = getProductoInfo(pid);
+  if (!p) { showToast('Producto no encontrado','error'); return; }
+  const cfg = consumosConfig[pid] || {};
+  if (cfg.limite_dia > 0) {
+    const yaUsado = consumosHoyEmpleadoProd(empleado, pid);
+    if (yaUsado + cant > cfg.limite_dia) {
+      const restante = cfg.limite_dia - yaUsado;
+      showToast(restante <= 0
+        ? `⚠ ${empleado} ya alcanzó el límite diario de ${p.desc}`
+        : `⚠ Solo puedes registrar ${restante} más hoy (límite: ${cfg.limite_dia})`, 'error');
+      return;
+    }
+  }
+  consumosLog.unshift({ ts: Date.now(), empleado, pid, desc: p.desc, cantidad: cant, formato: p.formato || '' });
+  saveConsumos();
+  showToast(`✓ ${cant} × ${p.desc} registrado para ${empleado}`, 'success');
+  if (cantEl) cantEl.value = '1';
+  cancelarSeleccionConsumo();
+  renderConsumoProductos();
+}
+
+// ── Panel HISTORIAL ──
+function renderConsumosList() {
+  const container = document.getElementById('consumos-list');
+  const resumen   = document.getElementById('consumos-resumen');
+  const subtitle  = document.getElementById('historial-subtitle');
+  if (!container) return;
+  const isGerente = currentRole === 'gerente';
+  let logs = consumosLog;
+  if (!isGerente) {
+    const hoy = new Date(); hoy.setHours(0,0,0,0);
+    logs = consumosLog.filter(c => new Date(c.ts) >= hoy);
+    if (subtitle) subtitle.textContent = 'Consumos de hoy';
+  } else {
+    if (subtitle) subtitle.textContent = `Historial completo · ${consumosLog.length} registros`;
+  }
+  if (!logs.length) {
+    container.innerHTML = `<div class="consumo-empty">Sin consumos registrados${!isGerente?' hoy':''}.<br><span style="font-size:11px;opacity:.6">Los registros aparecerán aquí.</span></div>`;
+    if (resumen) resumen.textContent = '0 consumos';
+    return;
+  }
+  container.innerHTML = logs.map(c => {
+    const realIdx = consumosLog.indexOf(c);
+    const d    = new Date(c.ts);
+    const hora = d.toLocaleString('es-ES', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+    const ini  = (c.empleado || '?').charAt(0).toUpperCase();
+    const delBtn = isGerente ? `<button class="consumo-del" onclick="deleteConsumo(${realIdx})" title="Eliminar">✕</button>` : '';
+    return `
+      <div class="consumo-row">
+        <div class="consumo-avatar">${ini}</div>
+        <div class="consumo-info">
+          <div class="consumo-empleado">${esc(c.empleado)}</div>
+          <div class="consumo-detalle">${esc(c.desc)}${c.formato?` <span style="color:var(--text-muted)">(${esc(c.formato)})</span>`:''}</div>
+          <div class="consumo-ts">${hora}</div>
+        </div>
+        <div class="consumo-qty">${c.cantidad} ${esc(c.formato)}</div>
+        ${delBtn}
+      </div>`;
+  }).join('');
+  if (resumen) {
+    const total = logs.reduce((s,c)=>s+(c.cantidad||0),0);
+    resumen.textContent = `${logs.length} consumo${logs.length!==1?'s':''} · ${total} uds.`;
+  }
+}
+
+function deleteConsumo(idx) {
+  if (!confirm('¿Eliminar este registro?')) return;
+  consumosLog.splice(idx, 1);
+  saveConsumos();
+  renderConsumosList();
+  showToast('Registro eliminado ✓','success');
+}
+
+function resetConsumos() {
+  if (!consumosLog.length) { showToast('No hay consumos que limpiar','error'); return; }
+  if (!confirm(`¿Eliminar los ${consumosLog.length} registros?\nEsta acción no se puede deshacer.`)) return;
+  consumosLog = [];
+  saveConsumos();
+  renderConsumosList();
+  showToast('Historial limpiado ✓','success');
+}
+
+function exportConsumos() {
+  if (!consumosLog.length) { showToast('No hay consumos que exportar','error'); return; }
+  const fecha = document.getElementById('fecha-input').value || new Date().toLocaleDateString('es-ES');
+  let txt = `CONSUMOS DEL PERSONAL — BOTANERO AZTECA\nFecha: ${fecha}\n${'─'.repeat(46)}\n\n`;
+  consumosLog.forEach(c => {
+    const d    = new Date(c.ts);
+    const hora = d.toLocaleString('es-ES', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+    txt += `${hora}  ${(c.empleado||'').padEnd(18)} ${(c.desc||'').padEnd(28)} ${String(c.cantidad).padStart(4)} ${c.formato}\n`;
+  });
+  txt += `\n${'─'.repeat(46)}\nTotal: ${consumosLog.length} registros\n`;
+  const blob = new Blob([txt], { type:'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = `consumos_personal_${fecha.replace(/\//g,'-')}.txt`;
+  a.click();
+  showToast('Exportado ✓','success');
+}
+
+// ── Panel CONFIGURAR (solo Gerente) ──
+function renderConsumosConfig() {
+  const container = document.getElementById('consumos-config-list');
+  if (!container) return;
+  const salaProv = DATA['sala'] || [];
+  if (!salaProv.length) {
+    container.innerHTML = '<div style="padding:28px;text-align:center;color:var(--text-dim);">No hay productos en Sala.</div>';
+    return;
+  }
+  let html = '';
+  salaProv.forEach(prov => {
+    if (!prov.productos.length) return;
+    html += `<div class="perm-prov-header">${esc(prov.nombre)}</div>`;
+    prov.productos.forEach(p => {
+      const cfg      = consumosConfig[p.id] || {};
+      const permitido = cfg.permitido || false;
+      const limiteDia = cfg.limite_dia != null ? cfg.limite_dia : 0;
+      html += `
+        <div class="consumo-config-row" id="ccrow-${p.id}">
+          <div class="cc-info">
+            <div class="cc-nombre">${esc(p.desc)}</div>
+            <div class="cc-fmt">${esc(p.formato||'')}</div>
+          </div>
+          <span class="cc-limite-label">Límite/día</span>
+          <input type="number" class="cc-limite-input" min="0" step="1"
+            value="${permitido && limiteDia > 0 ? limiteDia : ''}"
+            placeholder="—" ${permitido ? '' : 'disabled'}
+            id="cc-lim-${p.id}"
+            onchange="setConsumoLimite('${p.id}', this.value)"
+            title="0 = sin límite">
+          <label class="perm-toggle" title="${permitido ? 'Desactivar' : 'Activar'}">
+            <input type="checkbox" ${permitido ? 'checked' : ''}
+              onchange="toggleConsumoPermitido('${p.id}', this.checked)">
+            <span class="perm-slider"></span>
+          </label>
+        </div>`;
+    });
+  });
+  container.innerHTML = html;
+}
+
+function toggleConsumoPermitido(pid, permitido) {
+  if (!consumosConfig[pid]) consumosConfig[pid] = {};
+  consumosConfig[pid].permitido = permitido;
+  if (!permitido) delete consumosConfig[pid].limite_dia;
+  saveConsumosConfig();
+  const limInput = document.getElementById(`cc-lim-${pid}`);
+  if (limInput) { limInput.disabled = !permitido; if (!permitido) limInput.value = ''; }
+  showToast(permitido ? '✓ Producto autorizado para consumo' : 'Producto no autorizado', permitido ? 'success' : 'error');
+}
+
+function setConsumoLimite(pid, val) {
+  if (!consumosConfig[pid]) consumosConfig[pid] = { permitido: true };
+  const n = parseInt(val, 10);
+  consumosConfig[pid].limite_dia = (!val || isNaN(n) || n <= 0) ? null : n;
+  saveConsumosConfig();
+}
+
+// ── LEGACY shim para setBarraTab que aún puede ser llamado ──
+function populateConsumoSelect() { /* no-op, reemplazado */ }
+
+function focusConsumoProducto() {
+  const inp = document.getElementById('cp-empleado');
+  if (inp) inp.focus();
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 // ─── START ───
